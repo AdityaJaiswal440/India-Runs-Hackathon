@@ -1,0 +1,7 @@
+data/
+artifacts/candidate_embeddings.npy
+__pycache__/
+*.pyc
+.DS_Store
+ERA.csv
+*.egg-info/
