@@ -1,7 +1,26 @@
-data/
-artifacts/candidate_embeddings.npy
 __pycache__/
-*.pyc
+*.py[cod]
+.Python
+venv/
+.venv/
+
+.ipynb_checkpoints/
 .DS_Store
-ERA.csv
-*.egg-info/
+
+
+models/*
+!models/.gitkeep
+
+data/*
+
+# 2. Unlock the hallway to the two specific rooms we care about
+!data/raw/
+!data/interim/
+
+# 3. Lock all the contents inside those two rooms
+data/raw/*
+data/interim/*
+
+# 4. Whitelist ONLY the .gitkeep files sitting inside them
+!data/raw/.gitkeep
+!data/interim/.gitkeep
