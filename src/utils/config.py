@@ -17,6 +17,7 @@ class Config:
         FEATURES_TABLE_PATH = "tests/fixtures/interim/mock_features.parquet"
         JD_FULL_PATH = "tests/fixtures/data/mock_jd_full.txt"
         JD_REQUIREMENTS_PATH = "tests/fixtures/data/mock_jd_requirements.txt"
+        TEST_OUTPUT = "data/output/mock"
     else:
         logger.info("Running in PROD environment. Using real data paths.")
         RAW_DATA_PATH = "data/raw/candidates.jsonl.gz"
@@ -24,6 +25,8 @@ class Config:
         FEATURES_TABLE_PATH = "data/interim/features.parquet"
         JD_FULL_PATH = "data/raw/jd_paraphrased_full.txt"
         JD_REQUIREMENTS_PATH = "data/raw/jd_paraphrased_requirements.txt"
+        TEST_OUTPUT = "data/output"
+
     
     EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
     BATCH_SIZE = 64

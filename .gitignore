@@ -17,6 +17,7 @@ data/*
 
 !data/raw/
 !data/interim/
+!data/output/
 
 data/raw/*
 data/interim/*

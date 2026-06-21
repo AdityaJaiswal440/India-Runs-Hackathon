@@ -6,7 +6,12 @@ compute BM25 & Dense Embedding scores, and consolidate everything into a
 single Parquet feature table for the online ranking phase.
 """
 
+from pathlib import Path
 import os
+import sys
+
+sys.path.append(str(Path.cwd()))
+
 import re
 import time
 import numpy as np
@@ -64,6 +69,11 @@ def run_precompute():
         features_list.append(feats)
 
     logger.info(f"Processed {len(candidate_ids)} candidates. Starting BM25 and Embeddings...")
+
+    if not candidate_texts:
+        logger.error("Corpus is empty! Check your data loader or mock JSONL file.")
+        sys.exit(1)
+    # ----------------------
 
     # 4. Compute BM25 Scores
     logger.info("Tokenizing corpus for BM25...")
