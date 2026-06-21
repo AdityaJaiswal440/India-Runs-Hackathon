@@ -1,0 +1,1 @@
+Senior AI Engineer role requiring production experience with embeddings, vector databases, hybrid retrieval, and learning to rank at product companies.

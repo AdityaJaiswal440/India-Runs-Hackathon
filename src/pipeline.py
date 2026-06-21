@@ -8,28 +8,22 @@ Approach 1: Hybrid Semantic + Heuristic Scoring
 import time
 from src.data.loader import stream_candidates
 from src.utils.logger import get_logger
-import sys
+from src.utils.config import Config, ENV_MODE  # <-- 1. Imported central source of truth
 
 logger = get_logger(__name__)
 
-def main(candidate_filepath: str):
-    logger.info("=== Initializing Redrob Ranking Pipeline ===")
+def main():  # <-- 2. Removed the filepath parameter
+    logger.info(f"=== Initializing Redrob Pipeline [{ENV_MODE.upper()} MODE] ===")
+    logger.info(f"Reading candidates from: {Config.RAW_DATA_PATH}")
     start_time = time.time()
     
-    # --- Phase 1: Data Loading (Smoke Test) ---
-    # The stream_candidates function will automatically handle .gz or .jsonl
     candidate_count = 0
-    for candidate in stream_candidates(candidate_filepath):
+    for candidate in stream_candidates(Config.RAW_DATA_PATH):
         candidate_count += 1
         
     elapsed = time.time() - start_time
     logger.info(f"=== Pipeline Smoke Test Complete. Loaded {candidate_count} candidates in {elapsed:.2f}s ===")
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        path = sys.argv[1]
-    else:
-        # Fallback to a sample file path
-        path = "data/raw/sample_candidates.jsonl" 
-        
-    main(path)
+    main()  # <-- 3. Clean, zero-argument ignition
+
