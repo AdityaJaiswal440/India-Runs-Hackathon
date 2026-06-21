@@ -1,4 +1,8 @@
-.PHONY: setup build run test gameday
+# Makefile: Standardizes commands for the team. 
+# Usage: `make setup`, `make build`, `make run`, `make precompute`, `make test`
+
+
+.PHONY: setup build run test precompute gameday
 
 setup:
 	uv venv .venv
@@ -6,6 +10,9 @@ setup:
 
 build:
 	docker build -t india-runs-hackthon .
+
+precompute:
+	python scripts/precompute.py
 
 run:
 	python src/pipeline.py
