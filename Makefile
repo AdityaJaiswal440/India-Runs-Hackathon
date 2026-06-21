@@ -13,6 +13,5 @@ run:
 test:
 	pytest tests/ -v
 
-# The Titanium Cage (Game Day Simulation)
 gameday:
 	docker run --rm --memory="16g" --memory-swap="16g" --cpus="1.0" india-runs-hackthon
