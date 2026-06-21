@@ -20,7 +20,7 @@ from src.features.embedder import Embedder
 from src.features.honeypot import is_honeypot
 from src.features.heuristic_extractor import extract_features
 
-logger = get_logger(__name__)
+logger = get_logger("Offline_Precompute")
 
 def simple_tokenize(text: str) -> list:
     """Basic regex tokenizer for BM25: lowercases and strips punctuation."""
