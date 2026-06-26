@@ -77,6 +77,7 @@ def test_run_precompute_pipeline(mock_config, mock_stream, mock_honeypot, mock_e
     # Mock config paths to use pytest's tmp_path
     mock_config.JD_REQUIREMENTS_PATH = str(tmp_path / "jd.txt")
     mock_config.FEATURES_TABLE_PATH = str(tmp_path / "features.parquet")
+    mock_config.ARTIFACTS_DIR = str(tmp_path)
     
     # Create dummy JD file for the script to read
     with open(mock_config.JD_REQUIREMENTS_PATH, 'w') as f:

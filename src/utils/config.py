@@ -10,7 +10,9 @@ load_dotenv()
 
 def load_dataset_today() -> datetime.date:
     """Loads the TODAY anchor date from artifacts/dataset_today.txt or fails loudly."""
-    path = "artifacts/dataset_today.txt"
+    env = os.getenv("APP_ENV", "prod").lower()
+    artifacts_dir = "tests/fixtures/artifacts" if env == "test" else "artifacts"
+    path = os.path.join(artifacts_dir, "dataset_today.txt")
     if not os.path.exists(path):
         raise FileNotFoundError(f"Required dataset today anchor file not found: {path}")
     with open(path, "r", encoding="utf-8") as f:
@@ -28,6 +30,7 @@ class Config:
         JD_FULL_PATH = "tests/fixtures/data/mock_jd_full.txt"
         JD_REQUIREMENTS_PATH = "tests/fixtures/data/mock_jd_requirements.txt"
         TEST_OUTPUT = "data/output/mock"
+        ARTIFACTS_DIR = "tests/fixtures/artifacts"
     else:
         logger.info("Running in PROD environment. Using real data paths.")
         RAW_DATA_PATH = "data/raw/candidates.jsonl.gz"
@@ -36,6 +39,7 @@ class Config:
         JD_FULL_PATH = "data/raw/jd_paraphrased_full.txt"
         JD_REQUIREMENTS_PATH = "data/raw/jd_paraphrased_requirements.txt"
         TEST_OUTPUT = "data/output"
+        ARTIFACTS_DIR = "artifacts"
 
     EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
     BATCH_SIZE = 64

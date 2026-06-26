@@ -153,7 +153,7 @@ def run_precompute():
     start_time = time.time()
     
     # Ensure directories exist
-    os.makedirs("artifacts", exist_ok=True)
+    os.makedirs(Config.ARTIFACTS_DIR, exist_ok=True)
     os.makedirs("data/interim", exist_ok=True)
     
     # -----------------------------------------------------------------
@@ -166,7 +166,7 @@ def run_precompute():
     logger.info(f"Derived DATASET_TODAY: {today_str}")
     
     # Write temporal anchor
-    with open("artifacts/dataset_today.txt", "w", encoding="utf-8") as f:
+    with open(os.path.join(Config.ARTIFACTS_DIR, "dataset_today.txt"), "w", encoding="utf-8") as f:
         f.write(today_str)
         
     # Update Config in memory
@@ -399,21 +399,21 @@ def run_precompute():
     logger.info("Saving artifacts to disk...")
     
     # 1. features.npy
-    np.save("artifacts/features.npy", features)
+    np.save(os.path.join(Config.ARTIFACTS_DIR, "features.npy"), features)
     
     # 2. candidate_embeddings.npy
-    np.save("artifacts/candidate_embeddings.npy", candidate_embeddings)
+    np.save(os.path.join(Config.ARTIFACTS_DIR, "candidate_embeddings.npy"), candidate_embeddings)
     
     # 3. candidate_ids.pkl
-    with open("artifacts/candidate_ids.pkl", "wb") as f:
+    with open(os.path.join(Config.ARTIFACTS_DIR, "candidate_ids.pkl"), "wb") as f:
         pickle.dump(candidate_ids, f)
         
     # 4. bm25_model.pkl
-    with open("artifacts/bm25_model.pkl", "wb") as f:
+    with open(os.path.join(Config.ARTIFACTS_DIR, "bm25_model.pkl"), "wb") as f:
         pickle.dump(bm25, f)
         
     # 5. candidate_store.pkl
-    with open("artifacts/candidate_store.pkl", "wb") as f:
+    with open(os.path.join(Config.ARTIFACTS_DIR, "candidate_store.pkl"), "wb") as f:
         pickle.dump(candidate_store, f)
         
     # Also save fallback parquet file for pipeline compatibility
