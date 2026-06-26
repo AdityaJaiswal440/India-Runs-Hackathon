@@ -58,16 +58,16 @@ def main():
     
     final_scores = np.zeros_like(base_scores)
     for idx, cid in enumerate(candidate_ids):
-        # Honeypot mask check
-        if features[idx, 8] == 1.0:
-            final_scores[idx] = 0.0
-        else:
-            candidate = candidate_store[cid]
-            mult = behavioral_multiplier(candidate, today)
-            final_scores[idx] = base_scores[idx] * mult
-            
+        candidate = candidate_store[cid]
+        mult = behavioral_multiplier(candidate, today)
+        final_scores[idx] = base_scores[idx] * mult
+
     # Clamp final scores strictly to [0.001, 0.999]
     final_scores = np.clip(final_scores, 0.001, 0.999)
+
+    # Apply honeypot mask after clamping
+    honeypot_mask = features[:, 8] == 1.0
+    final_scores[honeypot_mask] = 0.0
     
     # 3. The Tie-Break Sort (SPEC-4 & SPEC-9)
     assert not np.any(np.isnan(final_scores)), "NaN scores detected!"
@@ -112,18 +112,19 @@ def main():
         for s in skills:
             if not s:
                 continue
-            sname = (s.get("name") or "").lower().strip()
-            if sname in JD_TAXONOMY:
+            original_name = (s.get("name") or "").strip()
+            sname_lower = original_name.lower()
+            if sname_lower in JD_TAXONOMY:
                 dur = s.get("duration_months", 0) or 0
                 if dur >= 6:
-                    base = JD_TAXONOMY[sname]
-                    assess_score = assessments.get(sname) or assessments.get(s.get("name"))
+                    base = JD_TAXONOMY[sname_lower]
+                    assess_score = assessments.get(sname_lower) or assessments.get(original_name)
                     if assess_score is not None:
                         assess_factor = float(assess_score) / 100.0
                     else:
                         assess_factor = 0.65
                     score = base * min(dur / 24.0, 1.0) * assess_factor
-                    valid_skills.append((s.get("name") or sname, dur, assess_score, score))
+                    valid_skills.append((original_name, dur, assess_score, score))
         if valid_skills:
             valid_skills.sort(key=lambda x: x[3], reverse=True)
             sname_display, dur, assess_score, score = valid_skills[0]
@@ -197,25 +198,16 @@ def main():
         return None
 
     def get_location_fact(candidate):
-        location = (candidate.get("profile") or {}).get("location") or candidate.get("location") or ""
-        signals = candidate.get("redrob_signals", {}) or {}
-        if location:
-            location_tokens = set(re.split(r"[,/\s\-]+", location.lower()))
-            tier1_cities = {"pune", "noida", "delhi", "gurgaon", "gurugram", "faridabad", "ncr"}
-            matched_city = None
-            for city in tier1_cities:
-                if city in location_tokens:
-                    matched_city = city.capitalize()
-                    if city == "ncr":
-                        matched_city = "NCR"
-                    break
-            if matched_city:
-                return (f"{matched_city}-based, no relocation needed", 0.90)
-            else:
-                willing_to_relocate = signals.get("willing_to_relocate", False)
-                if willing_to_relocate:
-                    return ("willing to relocate to Pune/Noida", 0.60)
-        return None
+        # Extract city from the candidate profile location string, isolating the first token before any comma.
+        location = (candidate.get("profile", {}) or {}).get("location", "Unknown")
+        city = location.split(',')[0].strip()
+        # Define allowed tier‑1 cities for deterministic matching.
+        allowed_cities = {"Pune", "Noida", "Mumbai", "Delhi", "Hyderabad"}
+        if city in allowed_cities:
+            # Return a deterministic fact with high confidence.
+            return (f"{city}-based", 0.90)
+        # If city is unknown or not in the allowed set, indicate relocatability.
+        return ("relocatable", 0.60)
 
     def get_notice_fact(candidate):
         signals = candidate.get("redrob_signals", {}) or {}

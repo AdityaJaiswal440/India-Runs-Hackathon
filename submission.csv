@@ -1,27 +1,27 @@
 candidate_id,rank,score,reasoning
-CAND_0082248,1,0.164435,"Top fit: Pune-based, no relocation needed; active on platform (last seen: 17d ago). Concern: no critical concerns identified."
+CAND_0082248,1,0.164435,"Top fit: active on platform (last seen: 17d ago); product-company career at Hooli, Acme Corp. Concern: no critical concerns identified."
 CAND_0009335,2,0.120144,"Top fit: active on platform (last seen: 14d ago); product-company career at Hooli, Pied Piper. Concern: email unverified."
-CAND_0059102,3,0.118611,"Top fit: Gurgaon-based, no relocation needed; active on platform (last seen: 17d ago). Concern: no critical concerns identified."
+CAND_0059102,3,0.118611,Top fit: active on platform (last seen: 17d ago); product-company career at CRED. Concern: no critical concerns identified.
 CAND_0054271,4,0.112434,Top fit: current role as Senior Software Engineer (ML) at Verloop.io; active on platform (last seen: 6d ago). Concern: notice period 90d.
-CAND_0011383,5,0.104099,"Top fit: Noida-based, no relocation needed; product-company career at Wayne Enterprises, Hooli. Concern: inactive 61d on platform."
+CAND_0011383,5,0.104099,"Top fit: product-company career at Wayne Enterprises, Hooli; recruiter response rate: 69%. Concern: inactive 61d on platform."
 CAND_0037675,6,0.097640,"Strong match: product-company career at Initech, Pied Piper; tier_1 institution. Concern: no critical concerns identified."
 CAND_0081095,7,0.096328,"Strong match: career text mentions RAG architectures; product-company career at Flipkart, Initech. Concern: notice period 90d."
-CAND_0016367,8,0.096238,"Strong match: Pune-based, no relocation needed; career text mentions RAG architectures. Concern: notice period 90d."
+CAND_0016367,8,0.096238,Strong match: career text mentions RAG architectures; active on platform (last seen: 9d ago). Concern: notice period 90d.
 CAND_0015524,9,0.096087,"Strong match: product-company career at Hooli, Globex Inc; recruiter response rate: 78%. Concern: inactive 65d on platform."
-CAND_0034822,10,0.090491,"Strong match: Gurgaon-based, no relocation needed; product-company career at Stark Industries, Swiggy. Concern: notice period 90d."
-CAND_0058153,11,0.086441,"Strong match: Gurgaon-based, no relocation needed; career text mentions RAG architectures. Concern: notice period 90d."
-CAND_0062432,12,0.085184,"Strong match: Delhi-based, no relocation needed; career text mentions RAG architectures. Concern: no critical concerns identified."
-CAND_0067645,13,0.084369,"Strong match: Noida-based, no relocation needed; product-company career at Wayne Enterprises. Concern: no critical concerns identified."
-CAND_0013290,14,0.084041,"Strong match: Noida-based, no relocation needed; career text mentions search systems. Concern: inactive 169d on platform."
+CAND_0034822,10,0.090491,"Strong match: product-company career at Stark Industries, Swiggy; recruiter response rate: 78%. Concern: notice period 90d."
+CAND_0058153,11,0.086441,Strong match: career text mentions RAG architectures; active on platform (last seen: 2d ago). Concern: notice period 90d.
+CAND_0062432,12,0.085184,Strong match: career text mentions RAG architectures; active on platform (last seen: 0d ago). Concern: no critical concerns identified.
+CAND_0067645,13,0.084369,Strong match: product-company career at Wayne Enterprises; recruiter response rate: 51%. Concern: no critical concerns identified.
+CAND_0013290,14,0.084041,"Strong match: career text mentions search systems; product-company career at Globex Inc, Pied Piper. Concern: inactive 169d on platform."
 CAND_0027337,15,0.083497,Strong match: career text mentions search systems; active on platform (last seen: 27d ago). Concern: no critical concerns identified.
-CAND_0049726,16,0.081758,"Strong match: Gurgaon-based, no relocation needed; product-company career at Wayne Enterprises, Initech. Concern: inactive 97d on platform."
+CAND_0049726,16,0.081758,"Strong match: product-company career at Wayne Enterprises, Initech; recruiter response rate: 70%. Concern: inactive 97d on platform."
 CAND_0020597,17,0.081601,Strong match: active on platform (last seen: 0d ago); product-company career at Globex Inc. Concern: no critical concerns identified.
 CAND_0098294,18,0.081134,Strong match: career text mentions RAG architectures; active on platform (last seen: 7d ago). Concern: no critical concerns identified.
 CAND_0030161,19,0.081074,"Strong match: active on platform (last seen: 22d ago); product-company career at Dunder Mifflin, Wayne Enterprises. Concern: notice period 150d."
 CAND_0095774,20,0.080640,"Strong match: career text mentions search systems; product-company career at Pied Piper, Hooli. Concern: email unverified."
 CAND_0022960,21,0.080565,"Solid candidate: career text mentions search systems; product-company career at Acme Corp, Stark Industries. Concern: no critical concerns identified."
-CAND_0015475,22,0.077082,"Solid candidate: Gurgaon-based, no relocation needed; product-company career at Initech, Zomato. Concern: inactive 90d on platform."
-CAND_0006232,23,0.075616,"Solid candidate: Delhi-based, no relocation needed; product-company career at Hooli, Initech. Concern: interview completion rate 48%."
+CAND_0015475,22,0.077082,"Solid candidate: product-company career at Initech, Zomato; 30-day notice period. Concern: inactive 90d on platform."
+CAND_0006232,23,0.075616,"Solid candidate: product-company career at Hooli, Initech; recruiter response rate: 56%. Concern: interview completion rate 48%."
 CAND_0069451,24,0.075557,Solid candidate: active on platform (last seen: 13d ago); product-company career at Initech. Concern: no critical concerns identified.
 CAND_0098829,25,0.075380,"Solid candidate: career text mentions RAG architectures; product-company career at Acme Corp, Initech. Concern: inactive 87d on platform."
 CAND_0043176,26,0.074508,"Solid candidate: product-company career at Acme Corp, Dunder Mifflin; 30-day notice period. Concern: inactive 86d on platform."
@@ -29,27 +29,27 @@ CAND_0040359,27,0.074425,"Solid candidate: active on platform (last seen: 13d ag
 CAND_0001128,28,0.073546,"Solid candidate: product-company career at Pied Piper, CRED; tier_1 institution. Concern: inactive 62d on platform."
 CAND_0044540,29,0.073384,Solid candidate: career text mentions search systems; active on platform (last seen: 20d ago). Concern: no critical concerns identified.
 CAND_0088770,30,0.072472,Solid candidate: career text mentions search systems; active on platform (last seen: 2d ago). Concern: no critical concerns identified.
-CAND_0009269,31,0.072147,"Solid candidate: Delhi-based, no relocation needed; career text mentions search systems. Concern: low recruiter response rate (25%)."
+CAND_0009269,31,0.072147,Solid candidate: career text mentions search systems; active on platform (last seen: 21d ago). Concern: low recruiter response rate (25%).
 CAND_0076511,32,0.070988,Solid candidate: active on platform (last seen: 15d ago); product-company career at Initech. Concern: no critical concerns identified.
-CAND_0075769,33,0.070806,"Solid candidate: Delhi-based, no relocation needed; career text mentions search systems. Concern: inactive 65d on platform."
+CAND_0075769,33,0.070806,"Solid candidate: career text mentions search systems; product-company career at Initech, Acme Corp. Concern: inactive 65d on platform."
 CAND_0028867,34,0.070582,"Solid candidate: active on platform (last seen: 18d ago); product-company career at Initech, Globex Inc. Concern: no critical concerns identified."
 CAND_0004252,35,0.070529,"Solid candidate: active on platform (last seen: 22d ago); product-company career at Initech, Acme Corp. Concern: no critical concerns identified."
 CAND_0082688,36,0.070479,"Solid candidate: active on platform (last seen: 27d ago); product-company career at Initech, PhonePe. Concern: low recruiter response rate (22%)."
-CAND_0043500,37,0.070371,"Solid candidate: Noida-based, no relocation needed; career text mentions RAG architectures. Concern: notice period 90d."
+CAND_0043500,37,0.070371,Solid candidate: career text mentions RAG architectures; recruiter response rate: 71%. Concern: notice period 90d.
 CAND_0098440,38,0.070008,Solid candidate: product-company career at Pied Piper; recruiter response rate: 62%. Concern: no critical concerns identified.
 CAND_0068394,39,0.069013,"Solid candidate: active on platform (last seen: 10d ago); product-company career at Zomato, Flipkart. Concern: notice period 90d."
-CAND_0031277,40,0.067425,"Solid candidate: Gurgaon-based, no relocation needed; product-company career at Dunder Mifflin, Wayne Enterprises. Concern: inactive 158d on platform."
+CAND_0031277,40,0.067425,"Solid candidate: product-company career at Dunder Mifflin, Wayne Enterprises; recruiter response rate: 62%. Concern: inactive 158d on platform."
 CAND_0011918,41,0.067300,Solid candidate: product-company career at Hooli; 30-day notice period. Concern: inactive 74d on platform.
 CAND_0075317,42,0.066555,"Solid candidate: active on platform (last seen: 20d ago); product-company career at Stark Industries, Globex Inc. Concern: no critical concerns identified."
-CAND_0064972,43,0.066039,"Solid candidate: Pune-based, no relocation needed; active on platform (last seen: 1d ago). Concern: notice period 120d."
-CAND_0027531,44,0.065351,"Solid candidate: Gurgaon-based, no relocation needed; product-company career at Pied Piper, Globex Inc. Concern: inactive 150d on platform."
+CAND_0064972,43,0.066039,"Solid candidate: active on platform (last seen: 1d ago); product-company career at Stark Industries, Globex Inc. Concern: notice period 120d."
+CAND_0027531,44,0.065351,"Solid candidate: product-company career at Pied Piper, Globex Inc; recruiter response rate: 63%. Concern: inactive 150d on platform."
 CAND_0008667,45,0.064970,"Solid candidate: product-company career at Dunder Mifflin, Hooli; recruiter response rate: 59%. Concern: inactive 75d on platform."
 CAND_0085240,46,0.064313,"Solid candidate: product-company career at Stark Industries, Pied Piper; recruiter response rate: 60%. Concern: notice period 90d."
 CAND_0041257,47,0.063893,"Solid candidate: career text mentions search systems; product-company career at Acme Corp, Hooli. Concern: no critical concerns identified."
 CAND_0029841,48,0.063482,"Solid candidate: product-company career at Initech, Pied Piper; recruiter response rate: 71%. Concern: inactive 83d on platform."
 CAND_0046542,49,0.063367,"Solid candidate: product-company career at Pied Piper, Paytm; Qdrant (29mo, assessed 67/100). Concern: inactive 128d on platform."
 CAND_0022488,50,0.063221,"Solid candidate: career text mentions search systems; product-company career at Initech, Globex Inc. Concern: notice period 90d."
-CAND_0027858,51,0.063220,"Marginal fit: Delhi-based, no relocation needed; product-company career at Initech, Globex Inc. Concern: inactive 89d on platform."
+CAND_0027858,51,0.063220,"Marginal fit: product-company career at Initech, Globex Inc; recruiter response rate: 27%. Concern: inactive 89d on platform."
 CAND_0037259,52,0.063095,"Marginal fit: product-company career at HCL, Mindtree; recruiter response rate: 68%. Concern: inactive 111d on platform."
 CAND_0016747,53,0.062352,Marginal fit: product-company career at CRED; FAISS (29mo). Concern: no critical concerns identified.
 CAND_0003479,54,0.062270,Marginal fit: career text mentions RAG architectures; product-company career at Pied Piper. Concern: inactive 145d on platform.
@@ -57,45 +57,45 @@ CAND_0083578,55,0.062090,"Marginal fit: career text mentions RAG architectures; 
 CAND_0081627,56,0.062075,"Marginal fit: career text mentions search systems; product-company career at Stark Industries, Hooli. Concern: inactive 106d on platform."
 CAND_0071494,57,0.062032,"Marginal fit: active on platform (last seen: 22d ago); product-company career at Globex Inc, Initech. Concern: interview completion rate 42%."
 CAND_0042405,58,0.061923,"Marginal fit: career text mentions RAG architectures; product-company career at HCL, Initech. Concern: inactive 118d on platform."
-CAND_0009755,59,0.061834,"Marginal fit: Delhi-based, no relocation needed; product-company career at Pied Piper, Initech. Concern: inactive 62d on platform."
+CAND_0009755,59,0.061834,"Marginal fit: product-company career at Pied Piper, Initech; recruiter response rate: 65%. Concern: inactive 62d on platform."
 CAND_0005898,60,0.061819,"Marginal fit: product-company career at Globex Inc, Hooli; recruiter response rate: 63%. Concern: inactive 125d on platform."
 CAND_0019156,61,0.061671,Marginal fit: product-company career at Acme Corp; recruiter response rate: 64%. Concern: notice period 90d.
-CAND_0039551,62,0.061634,"Marginal fit: Gurgaon-based, no relocation needed; active on platform (last seen: 3d ago). Concern: no critical concerns identified."
+CAND_0039551,62,0.061634,"Marginal fit: active on platform (last seen: 3d ago); product-company career at Stark Industries, Wayne Enterprises. Concern: no critical concerns identified."
 CAND_0001716,63,0.061356,"Marginal fit: active on platform (last seen: 26d ago); product-company career at Razorpay, Swiggy. Concern: notice period 150d."
 CAND_0034687,64,0.061235,Marginal fit: career text mentions RAG architectures; active on platform (last seen: 27d ago). Concern: no critical concerns identified.
 CAND_0057891,65,0.061061,"Marginal fit: product-company career at Globex Inc, Hooli; recruiter response rate: 77%. Concern: inactive 149d on platform."
 CAND_0035554,66,0.060882,Marginal fit: career text mentions RAG architectures; product-company career at Flipkart. Concern: inactive 65d on platform.
 CAND_0019268,67,0.060569,"Marginal fit: product-company career at Dunder Mifflin, Initech; recruiter response rate: 60%. Concern: inactive 157d on platform."
 CAND_0000580,68,0.060387,Marginal fit: career text mentions search systems; product-company career at Stark Industries. Concern: interview completion rate 37%.
-CAND_0088442,69,0.059816,"Marginal fit: Noida-based, no relocation needed; active on platform (last seen: 13d ago). Concern: interview completion rate 39%."
+CAND_0088442,69,0.059816,"Marginal fit: active on platform (last seen: 13d ago); product-company career at Wayne Enterprises, Dunder Mifflin. Concern: interview completion rate 39%."
 CAND_0098334,70,0.059648,"Marginal fit: career text mentions RAG architectures; product-company career at Wayne Enterprises, Zomato. Concern: no critical concerns identified."
-CAND_0068398,71,0.059491,"Marginal fit: Delhi-based, no relocation needed; Pinecone (50mo, assessed 80/100). Concern: notice period 90d."
+CAND_0068398,71,0.059491,"Marginal fit: Pinecone (50mo, assessed 80/100); active on platform (last seen: 27d ago). Concern: notice period 90d."
 CAND_0062671,72,0.059339,Marginal fit: career text mentions RAG architectures; active on platform (last seen: 18d ago). Concern: notice period 90d.
-CAND_0034677,73,0.059116,"Marginal fit: Delhi-based, no relocation needed; product-company career at Initech, Wayne Enterprises. Concern: inactive 73d on platform."
+CAND_0034677,73,0.059116,"Marginal fit: product-company career at Initech, Wayne Enterprises; recruiter response rate: 73%. Concern: inactive 73d on platform."
 CAND_0007467,74,0.059072,"Marginal fit: active on platform (last seen: 6d ago); product-company career at Acme Corp, Pied Piper. Concern: no critical concerns identified."
-CAND_0082265,75,0.059045,"Marginal fit: Pune-based, no relocation needed; product-company career at Pied Piper, Initech. Concern: inactive 68d on platform."
-CAND_0073476,76,0.058672,"Marginal fit: Pune-based, no relocation needed; career text mentions search systems. Concern: notice period 150d."
-CAND_0037426,77,0.058621,"Marginal fit: Gurgaon-based, no relocation needed; career text mentions search systems. Concern: inactive 76d on platform."
-CAND_0082352,78,0.058516,"Marginal fit: Noida-based, no relocation needed; product-company career at Initech, Pied Piper. Concern: inactive 177d on platform."
-CAND_0018214,79,0.058333,"Marginal fit: Pune-based, no relocation needed; active on platform (last seen: 22d ago). Concern: notice period 90d."
+CAND_0082265,75,0.059045,"Marginal fit: product-company career at Pied Piper, Initech; 30-day notice period. Concern: inactive 68d on platform."
+CAND_0073476,76,0.058672,"Marginal fit: career text mentions search systems; product-company career at Hooli, Wayne Enterprises. Concern: notice period 150d."
+CAND_0037426,77,0.058621,Marginal fit: career text mentions search systems; product-company career at Acme Corp. Concern: inactive 76d on platform.
+CAND_0082352,78,0.058516,"Marginal fit: product-company career at Initech, Pied Piper; 30-day notice period. Concern: inactive 177d on platform."
+CAND_0018214,79,0.058333,"Marginal fit: active on platform (last seen: 22d ago); product-company career at Stark Industries, Pied Piper. Concern: notice period 90d."
 CAND_0086505,80,0.058072,"Marginal fit: product-company career at Dunder Mifflin, Pied Piper; tier_1 institution. Concern: inactive 61d on platform."
 CAND_0090766,81,0.057609,"Below cutoff but included: career text mentions RAG architectures; product-company career at HCL, Zomato. Concern: inactive 64d on platform."
 CAND_0083898,82,0.057446,"Below cutoff but included: product-company career at Wayne Enterprises, Stark Industries; recruiter response rate: 70%. Concern: notice period 90d."
-CAND_0023098,83,0.057279,"Below cutoff but included: Delhi-based, no relocation needed; product-company career at Mindtree. Concern: inactive 129d on platform."
+CAND_0023098,83,0.057279,Below cutoff but included: product-company career at Mindtree; recruiter response rate: 65%. Concern: inactive 129d on platform.
 CAND_0069270,84,0.057273,"Below cutoff but included: active on platform (last seen: 10d ago); product-company career at Globex Inc, Stark Industries. Concern: notice period 150d."
-CAND_0015899,85,0.057140,"Below cutoff but included: Delhi-based, no relocation needed; product-company career at Mindtree. Concern: inactive 111d on platform."
+CAND_0015899,85,0.057140,Below cutoff but included: product-company career at Mindtree; tier_1 institution. Concern: inactive 111d on platform.
 CAND_0026206,86,0.057109,"Below cutoff but included: career text mentions RAG architectures; product-company career at Acme Corp, Wayne Enterprises. Concern: inactive 144d on platform."
-CAND_0027486,87,0.057040,"Below cutoff but included: Delhi-based, no relocation needed; career text mentions search systems. Concern: inactive 165d on platform."
-CAND_0048260,88,0.056992,"Below cutoff but included: Noida-based, no relocation needed; product-company career at Pied Piper, Globex Inc. Concern: notice period 90d."
+CAND_0027486,87,0.057040,"Below cutoff but included: career text mentions search systems; product-company career at Hooli, Acme Corp. Concern: inactive 165d on platform."
+CAND_0048260,88,0.056992,"Below cutoff but included: product-company career at Pied Piper, Globex Inc; recruiter response rate: 73%. Concern: notice period 90d."
 CAND_0094603,89,0.056913,"Below cutoff but included: product-company career at Hooli, Acme Corp; 30-day notice period. Concern: inactive 96d on platform."
-CAND_0026861,90,0.056444,"Below cutoff but included: Noida-based, no relocation needed; career text mentions search systems. Concern: interview completion rate 42%."
+CAND_0026861,90,0.056444,"Below cutoff but included: career text mentions search systems; product-company career at Acme Corp, Hooli. Concern: interview completion rate 42%."
 CAND_0072196,91,0.056392,"Below cutoff but included: career text mentions search systems; product-company career at Initech, Hooli. Concern: notice period 90d."
 CAND_0053405,92,0.056249,Below cutoff but included: career text mentions RAG architectures; active on platform (last seen: 2d ago). Concern: notice period 120d.
 CAND_0047270,93,0.056185,Below cutoff but included: product-company career at Pied Piper; recruiter response rate: 62%. Concern: inactive 87d on platform.
-CAND_0006533,94,0.056169,"Below cutoff but included: Gurgaon-based, no relocation needed; career text mentions RAG architectures. Concern: inactive 76d on platform."
+CAND_0006533,94,0.056169,"Below cutoff but included: career text mentions RAG architectures; product-company career at Initech, Pied Piper. Concern: inactive 76d on platform."
 CAND_0074863,95,0.055939,"Below cutoff but included: active on platform (last seen: 18d ago); product-company career at Zomato, CRED. Concern: no critical concerns identified."
 CAND_0024503,96,0.055828,"Below cutoff but included: active on platform (last seen: 10d ago); product-company career at Globex Inc, Acme Corp. Concern: notice period 120d."
 CAND_0091470,97,0.055549,Below cutoff but included: product-company career at HCL; recruiter response rate: 65%. Concern: inactive 77d on platform.
-CAND_0078223,98,0.055545,"Below cutoff but included: Noida-based, no relocation needed; career text mentions search systems. Concern: inactive 109d on platform."
+CAND_0078223,98,0.055545,"Below cutoff but included: career text mentions search systems; product-company career at Globex Inc, Pied Piper. Concern: inactive 109d on platform."
 CAND_0049597,99,0.055352,"Below cutoff but included: career text mentions RAG architectures; product-company career at Swiggy, Hooli. Concern: inactive 131d on platform."
 CAND_0054179,100,0.055339,"Below cutoff but included: product-company career at Acme Corp, Initech; 30-day notice period. Concern: inactive 175d on platform."

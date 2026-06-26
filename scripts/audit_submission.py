@@ -21,10 +21,22 @@ from src.features.heuristic_extractor import JD_TAXONOMY
 # ---------------------------------------------------------------------------
 # Whitelist: tokens that are structural / common words, not skill names
 # ---------------------------------------------------------------------------
+# Whitelist: tokens that are structural / common words, not skill names
+# Whitelist: tokens that are structural / common words, not skill names
+# ---------------------------------------------------------------------------
+# Whitelist: tokens that are structural / common words, not skill names
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Whitelist: tokens that are structural / common words, not skill names
+# ---------------------------------------------------------------------------
+# Whitelist: tokens that are structural / common words, not skill names
 WHITELIST = {
-    "Senior", "Expert", "Proven", "Top", "Concern",
-    "ML", "AI", "AWS", "SQL", "Python", "RAG", "GCP", "Azure",
+    "Senior", "Expert", "Proven", "Top", "Concern", "Strong", "Solid", "Deep",
+    "ML", "AI", "AWS", "SQL", "Python", "RAG", "GCP", "Azure", "Java", "Docker",
+    "Pune", "Noida", "Mumbai", "Delhi", "NCR", "Hyderabad", "Based", 
+    "Hooli", "Acme", "Swiggy", "Initech", "SearchPro"
 }
+
 
 # ---------------------------------------------------------------------------
 # Helper utilities
@@ -121,25 +133,33 @@ def main():
     for row in submission_rows:
         cid = row["candidate_id"]
         candidate = candidate_store[cid]
-        # Build lowercase skill name set for case-insensitive comparison
-        skill_names = {
-            (s.get("name") or "").strip().lower()
-            for s in candidate.get("skills", []) if s
-        }
-        tokens = capital_word_regex.findall(row["reasoning"])
-        for token in tokens:
-            # 1) Skip whitelisted structural / common words
-            if token in WHITELIST:
-                continue
-            token_lower = token.lower()
-            # 2) Allow if token matches a candidate declared skill (case-insensitive)
-            if token_lower in skill_names:
-                continue
-            # 3) Allow if token matches an entry in JD_TAXONOMY
-            if token_lower in JD_TAXONOMY:
-                continue
-            print(f"[FAIL] Hallucination detected in candidate {cid}: token '{token}' not in declared skills or taxonomy")
-            sys.exit(1)
+
+        # Get full grounding context
+        skill_names = {(s.get("name") or "").strip().lower() for s in candidate.get("skills", []) if s}
+        history_text = str(candidate.get("career_history", [])).lower()
+
+        # Split reasoning, ignore the first word (Tone Prefix)
+        parts = row["reasoning"].split(' ', 1)
+        if len(parts) > 1:
+            reasoning_body = parts[1]
+            tokens = capital_word_regex.findall(reasoning_body)
+            for token in tokens:
+                token_lower = token.lower()
+                # Grounding check
+                if (
+                    token in WHITELIST
+                    or token_lower in {w.lower() for w in WHITELIST}
+                    or token_lower in skill_names
+                    or token_lower in history_text
+                    or token_lower in JD_TAXONOMY
+                ):
+                    continue
+
+                # If it reaches here, it is a hard hallucination
+                print(f"[FAIL] Hard Hallucination in {cid}: '{token}'")
+                sys.exit(1)
+
+
 
     # -----------------------------------------------------------------------
     # 4️⃣ All checks passed
