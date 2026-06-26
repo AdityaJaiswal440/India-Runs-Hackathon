@@ -166,7 +166,7 @@ def main():
     # -----------------------------------------------------------------------
     # 4️⃣ All checks passed
     # -----------------------------------------------------------------------
-    print("✅ Audit passed – submission satisfies SPEC‑14 and Gate P4.")
+    print("[SUCCESS] Audit passed - submission satisfies SPEC-14 and Gate P4.")
     sys.exit(0)
 
 if __name__ == "__main__":

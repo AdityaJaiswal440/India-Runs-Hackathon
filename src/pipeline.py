@@ -71,16 +71,14 @@ def main():
     
     # 3. The Tie-Break Sort (SPEC-4 & SPEC-9)
     assert not np.any(np.isnan(final_scores)), "NaN scores detected!"
+    assert not np.any(np.isinf(final_scores)), "Infinity scores detected!"
     
-    # argsort is ascending, [::-1] makes it descending
-    top_indices = np.argsort(final_scores, kind='stable')[::-1][:100]
+    # Combine candidate_ids and final_scores into a list and sort the entire pool
+    # by score descending, then candidate_id ascending to guarantee tie-breaker correctness.
+    all_candidates = list(zip(candidate_ids, final_scores))
+    all_candidates.sort(key=lambda x: (-x[1], x[0]))
     
-    top_candidates = []
-    for idx in top_indices:
-        top_candidates.append((candidate_ids[idx], float(final_scores[idx])))
-        
-    # Mandatory secondary sort to satisfy tie-break: sort by score descending, then candidate_id ascending
-    top_candidates.sort(key=lambda x: (-x[1], x[0]))
+    top_candidates = all_candidates[:100]
     
     # 4. Procedural Reasoning Engine (SPEC-7)
     # Define extractors
