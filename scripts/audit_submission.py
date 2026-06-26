@@ -126,6 +126,14 @@ def main():
         first_line = f.readline().strip()
     assert_true(first_line == ",".join(expected_header), "CSV header does not match spec")
 
+    # 2.10 Honeypot Integrity Check
+    for row in submission_rows:
+        cid = row["candidate_id"]
+        score = float(row["score"])
+        # If candidate is a honeypot (has a 'honeypot' flag in store), score MUST be 0.0
+        if candidate_store[cid].get("is_honeypot", False):
+            assert_true(score == 0.0, f"Honeypot candidate {cid} must have score 0.0")
+
     # -----------------------------------------------------------------------
     # 3️⃣ Gate P4 – Anti‑Hallucination Test
     # -----------------------------------------------------------------------
