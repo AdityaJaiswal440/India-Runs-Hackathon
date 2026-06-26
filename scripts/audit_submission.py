@@ -1,6 +1,6 @@
 """scripts/audit_submission.py
 
-Audit script implementing SPEC-14 assertions and the Gate P4 anti‑hallucination test.
+Audit script implementing SPEC-14 assertions and the Gate P4 anti-hallucination test.
 
 Usage:
     python scripts/audit_submission.py [submission.csv]
@@ -18,9 +18,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.features.heuristic_extractor import JD_TAXONOMY
 
-
-
-
+# ---------------------------------------------------------------------------
+# Helper utilities
 # ---------------------------------------------------------------------------
 
 def load_submission(csv_path: str):
@@ -107,54 +106,67 @@ def main():
         first_line = f.readline().strip()
     assert_true(first_line == ",".join(expected_header), "CSV header does not match spec")
 
-    # 2.10 Honeypot Integrity Check
+    # 2.10 Honeypot Integrity Check (SPEC-5.14)
     for row in submission_rows:
         cid = row["candidate_id"]
         score = float(row["score"])
-        # If candidate is a honeypot (has a 'honeypot' flag in store), score MUST be 0.0
         if candidate_store[cid].get("is_honeypot", False):
             assert_true(score == 0.0, f"Honeypot candidate {cid} must have score 0.0")
 
     # -----------------------------------------------------------------------
-    # 3️⃣ Gate P4 – Entity-Only Audit (The "Gold Standard" Fix)
+    # 3️⃣ Gate P4 – Entity-Centric Semantic Grounding
     # -----------------------------------------------------------------------
-    # We only audit technical entities, not sentence structure.
+    # Golden Rule: We ONLY validate tokens that are technical entities
+    # (i.e., they exist in JD_TAXONOMY). Standard English words like
+    # "critical", "concern", "fit", "seen" are NOT technical entities
+    # and are unconditionally ignored.
+    #
+    # For each taxonomy term found in the reasoning, we verify it is
+    # grounded in the candidate's actual profile (skills or career history).
+
     for row in submission_rows:
         cid = row["candidate_id"]
         candidate = candidate_store[cid]
-        
-        # 1. Define our "Gold Set" of valid technical entities
-        valid_entities = {s.get("name", "").lower() for s in (candidate.get("skills", []) or []) if s}
-        valid_entities.update({j.get("company", "").lower() for j in (candidate.get("career_history", []) or []) if j and j.get("company")})
-        valid_entities.update(JD_TAXONOMY)
-        
-        # 2. Extract words from reasoning
-        reasoning = row["reasoning"].lower()
-        # Use a regex that ONLY finds words that are 4+ chars long 
-        # and ignores common stop words automatically
-        tokens = re.findall(r'\b[a-z]{4,}\b', reasoning)
-        
-        for token in tokens:
-            # If the token is a technical entity, it MUST be valid
-            # If the token is NOT a technical entity, we IGNORE it (it's just English)
-            
-            # Check: Is this word a potential technical entity?
-            # We define potential entities as words that appear in our taxonomy or history
-            is_potential_entity = (token in JD_TAXONOMY or token in valid_entities)
-            
-            # We only throw an error if a word looks like it *should* be an entity 
-            # but fails validation. We stop auditing "critical", "seen", etc.
-            if token in JD_TAXONOMY and token not in valid_entities:
-                 # This is a true hallucination
-                 print(f"[FAIL] Hallucination in {cid}: '{token}' is in taxonomy but not profile")
-                 sys.exit(1)
 
+        # Build the candidate's valid entity set from their profile
+        valid_candidate_entities = set()
 
+        # Add all skill names (lowercased)
+        for s in (candidate.get("skills", []) or []):
+            if s and s.get("name"):
+                valid_candidate_entities.add(s["name"].strip().lower())
+
+        # Add all company names (lowercased)
+        for job in (candidate.get("career_history", []) or []):
+            if job and job.get("company"):
+                valid_candidate_entities.add(job["company"].strip().lower())
+
+        # Serialise the entire candidate profile for substring fallback
+        candidate_text = str(candidate).lower()
+
+        # Lowercase the reasoning for matching
+        reasoning_lower = row["reasoning"].lower()
+
+        # Check each taxonomy term: if it appears in the reasoning,
+        # it MUST be grounded in the candidate's profile
+        for term in JD_TAXONOMY:
+            if term in reasoning_lower:
+                # This technical term was claimed in the reasoning.
+                # Verify it exists in the candidate's skills, companies,
+                # or anywhere in the raw candidate profile string.
+                if term in valid_candidate_entities:
+                    continue
+                if term in candidate_text:
+                    continue
+                # Hard hallucination: taxonomy term claimed but not in profile
+                print(f"[FAIL] Hallucination in {cid}: taxonomy term '{term}' "
+                      f"found in reasoning but not in candidate profile")
+                sys.exit(1)
 
     # -----------------------------------------------------------------------
     # 4️⃣ All checks passed
     # -----------------------------------------------------------------------
-    print("✅ Audit passed – submission satisfies SPEC‑14 and Gate P4.")
+    print("✅ Audit passed – submission satisfies SPEC‑14 and Gate P4.")
     sys.exit(0)
 
 if __name__ == "__main__":
