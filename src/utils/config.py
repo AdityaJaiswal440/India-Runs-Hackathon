@@ -1,11 +1,26 @@
 # src/utils/config.py
 import os
+import datetime
 from dotenv import load_dotenv
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 load_dotenv()
+
+def load_dataset_today() -> datetime.date:
+    """Loads the TODAY anchor date from artifacts/dataset_today.txt or returns a fallback."""
+    path = "artifacts/dataset_today.txt"
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                date_str = f.read().strip()
+            if date_str:
+                return datetime.date.fromisoformat(date_str)
+        except Exception as e:
+            logger.warning(f"Failed to parse dataset_today.txt: {e}. Using fallback.")
+    # Fallback date if file doesn't exist yet or is malformed
+    return datetime.date(2026, 6, 26)
 
 class Config:
     APP_ENV = os.getenv("APP_ENV", "prod").lower()
@@ -27,6 +42,8 @@ class Config:
         JD_REQUIREMENTS_PATH = "data/raw/jd_paraphrased_requirements.txt"
         TEST_OUTPUT = "data/output"
 
-    
     EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
     BATCH_SIZE = 64
+    
+    # Determinism Anchor (SPEC-2.2)
+    TODAY = load_dataset_today()
