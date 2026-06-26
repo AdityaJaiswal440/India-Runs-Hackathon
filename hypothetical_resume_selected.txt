@@ -1,0 +1,2 @@
+Senior AI Engineer | Specialist in Embeddings, Hybrid Retrieval, and Ranking Senior AI Engineer Skills: python embeddings sentence-transformers bge openai embeddings vector database pinecone weaviate qdrant milvus faiss opensearch elasticsearch hybrid search retrieval rag ndcg mrr map learning to rank Built v2 ranking system improving recruiter-engagement metrics via embeddings, hybrid retrieval, and LLM-based re-ranking. Managed embedding drift, index refresh, and retrieval-quality regressions. Set up offline benchmarks, A/B testing, and offline-to-online correlation. 
+

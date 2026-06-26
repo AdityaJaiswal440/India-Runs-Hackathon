@@ -1,28 +1,41 @@
+# Python environment
 __pycache__/
 *.py[cod]
+*$py.class
 .Python
 venv/
 .venv/
+env/
 
-.env
-
+# IDE files
 .ipynb_checkpoints/
 .DS_Store
 
+# Local settings and logs
+.env
+logs/
+*.log
 
-models/*
-!models/.gitkeep
-
+# Data and Models
 data/*
-
 !data/raw/
 !data/interim/
 !data/output/
-
 data/raw/*
 data/interim/*
-
 !data/raw/.gitkeep
 !data/interim/.gitkeep
+models/*
+!models/.gitkeep
 
-logs
+# SPEC-11: Artifacts Registry
+# Exclude the three oversized files (>100MB) from Git
+artifacts/candidate_store.pkl
+artifacts/bm25_model.pkl
+artifacts/candidate_embeddings.npy
+
+# Explicitly allow final outputs to be tracked
+!artifacts/features.npy
+!artifacts/features.parquet
+!artifacts/candidate_ids.pkl
+!artifacts/dataset_today.txt
