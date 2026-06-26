@@ -34,7 +34,6 @@ from src.features.heuristic_extractor import (
     compute_location_score,
     compute_education_score,
     compute_engagement_score,
-    extract_features,
     JD_TAXONOMY,
     TIER_1_SKILLS
 )
@@ -417,16 +416,6 @@ def run_precompute():
     with open("artifacts/candidate_store.pkl", "wb") as f:
         pickle.dump(candidate_store, f)
         
-    # Compute legacy compatibility features
-    yoe_distance_list = []
-    behavior_score_list = []
-    is_consulting_only_list = []
-    for candidate in stream_candidates(Config.RAW_DATA_PATH):
-        feats = extract_features(candidate)
-        yoe_distance_list.append(feats["yoe_distance"])
-        behavior_score_list.append(feats["behavior_score"])
-        is_consulting_only_list.append(feats["is_consulting_only"])
-
     # Also save fallback parquet file for pipeline compatibility
     df_parquet = pd.DataFrame(features, columns=[
         "rrf_score", "skill_match_score", "skill_gap_coverage", "career_score",
@@ -438,9 +427,6 @@ def run_precompute():
     # Add legacy columns for V1/test compatibility
     df_parquet["bm25_score"] = bm25_raw
     df_parquet["dense_sim_score"] = dense_sim_score_legacy
-    df_parquet["behavior_score"] = behavior_score_list
-    df_parquet["yoe_distance"] = yoe_distance_list
-    df_parquet["is_consulting_only"] = is_consulting_only_list
     
     # Save Parquet
     df_parquet.to_parquet(Config.FEATURES_TABLE_PATH, index=False)

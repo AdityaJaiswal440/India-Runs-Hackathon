@@ -473,56 +473,149 @@ def compute_engagement_score(candidate: dict) -> float:
         min(int(search) / 30.0, 1.0) * 0.30
     )
     return float(score)
-
-def extract_features(candidate: dict) -> dict:
+def behavioral_multiplier(candidate: dict, today: datetime.date) -> float:
     """
-    Legacy compatibility wrapper.
+    Computes a candidate's behavioral multiplier based on engagement and activity signals.
+    Chained multiplication starting at m = 1.0. Clamped to [0.05, 1.15].
     """
-    profile = candidate.get("profile", {})
-    yoe = profile.get("years_of_experience", 0)
-    
-    # Distance from sweet spot
-    if 5 <= yoe <= 9:
-        yoe_distance = 0
-    elif yoe < 5:
-        yoe_distance = 5 - yoe
-    else:
-        yoe_distance = yoe - 9
-        
-    history = candidate.get("career_history", []) or []
-    is_consulting_only = False
-    if history:
-        is_consulting_only = all(
-            any(cfirm in (job.get("company") or "").lower() for cfirm in CONSULTING_FIRMS)
-            for job in history if job
-        )
-        
     signals = candidate.get("redrob_signals", {}) or {}
-    behavior_score = 1.0
-    response_rate = signals.get("recruiter_response_rate", 0) or 0.0
-    if response_rate < 0.3:
-        behavior_score -= 0.2
-        
-    notice_period = signals.get("notice_period_days", 60) or 60
-    if notice_period > 90:
-        behavior_score -= 0.2
-        
-    # Check last active date
-    last_active = signals.get("last_active_date", "")
-    if last_active:
-        last_active_dt = safe_date(last_active)
-        if last_active_dt:
-            days_inactive = (datetime.date(2026, 1, 1) - last_active_dt).days
-            if days_inactive > 180:
-                behavior_score -= 0.3
+    m = 1.0
 
-    behavior_score = max(0.5, behavior_score)
-        
-    return {
-        "yoe": yoe,
-        "yoe_distance": yoe_distance,
-        "is_consulting_only": is_consulting_only,
-        "behavior_score": behavior_score,
-        "response_rate": response_rate,
-        "notice_period": notice_period
-    }
+    # 1. open_to_work_flag
+    if signals.get("open_to_work_flag", True) is False:
+        m *= 0.80
+
+    # 2. days_inactive
+    last_active_str = signals.get("last_active_date")
+    if last_active_str:
+        try:
+            if isinstance(last_active_str, datetime.date):
+                last_active_dt = last_active_str
+            else:
+                last_active_dt = datetime.date.fromisoformat(last_active_str)
+            days_inactive = (today - last_active_dt).days
+            
+            if days_inactive > 180:
+                m *= 0.40
+            elif 91 <= days_inactive <= 180:
+                m *= 0.70
+            elif 61 <= days_inactive <= 90:
+                m *= 0.85
+            elif 31 <= days_inactive <= 60:
+                m *= 0.93
+        except (ValueError, TypeError):
+            pass
+
+    # 3. recruiter_response_rate
+    rr = signals.get("recruiter_response_rate")
+    if rr is not None:
+        try:
+            rr_val = float(rr)
+            m *= (0.25 + 0.75 * rr_val)
+        except (ValueError, TypeError):
+            pass
+
+    # 4. avg_response_time_hours
+    avg_response_time = signals.get("avg_response_time_hours")
+    if avg_response_time is not None:
+        try:
+            hours = float(avg_response_time)
+            if hours > 96:
+                m *= 0.65
+            elif 48 <= hours <= 96:
+                m *= 0.80
+            elif 24 <= hours < 48:
+                m *= 0.90
+        except (ValueError, TypeError):
+            pass
+
+    # 5. notice_period_days
+    notice_period = signals.get("notice_period_days")
+    if notice_period is not None:
+        try:
+            np_days = float(notice_period)
+            if np_days <= 15:
+                m *= 1.00
+            elif 16 <= np_days <= 30:
+                m *= 0.97
+            elif 31 <= np_days <= 60:
+                m *= 0.93
+            elif 61 <= np_days <= 90:
+                m *= 0.80
+            elif np_days > 90:
+                m *= 0.60
+        except (ValueError, TypeError):
+            pass
+
+    # 6. verified_email
+    if signals.get("verified_email", True) is False:
+        m *= 0.80
+
+    # 7. verified_phone
+    if signals.get("verified_phone", True) is False:
+        m *= 0.85
+
+    # 8. interview_completion_rate (icr)
+    icr = signals.get("interview_completion_rate")
+    if icr is not None:
+        try:
+            icr_val = float(icr)
+            m *= (0.40 + 0.60 * icr_val)
+        except (ValueError, TypeError):
+            pass
+
+    # 9. offer_acceptance_rate (oar)
+    oar = signals.get("offer_acceptance_rate")
+    if oar is not None and oar != -1:
+        try:
+            oar_val = float(oar)
+            m *= (0.60 + 0.40 * max(oar_val, 0.0))
+        except (ValueError, TypeError):
+            pass
+
+    # 10. github_activity_score
+    gh_score = signals.get("github_activity_score")
+    if gh_score is not None:
+        try:
+            gh_val = float(gh_score)
+            if gh_val == -1:
+                m *= 0.88
+            elif 0 <= gh_val <= 9:
+                m *= 0.92
+            elif gh_val > 60:
+                m *= 1.05
+        except (ValueError, TypeError):
+            pass
+
+    # 11. profile_completeness_score
+    profile_completeness = signals.get("profile_completeness_score")
+    if profile_completeness is not None:
+        try:
+            pc_val = float(profile_completeness)
+            if pc_val < 50:
+                m *= 0.85
+        except (ValueError, TypeError):
+            pass
+
+    # 12. linkedin_connected
+    if signals.get("linkedin_connected", True) is False:
+        m *= 0.93
+
+    # 13. Architect-stopped-coding penalty (checking current_title against days_inactive > 540)
+    title = (candidate.get("profile") or {}).get("current_title") or candidate.get("current_title") or ""
+    title_lower = str(title).lower()
+    if any(term in title_lower for term in ["architect", "tech lead", "principal"]):
+        if last_active_str:
+            try:
+                if isinstance(last_active_str, datetime.date):
+                    last_active_dt = last_active_str
+                else:
+                    last_active_dt = datetime.date.fromisoformat(last_active_str)
+                days_inactive = (today - last_active_dt).days
+                if days_inactive > 540:
+                    m *= 0.50
+            except (ValueError, TypeError):
+                pass
+
+    # Final clamp
+    return float(max(min(m, 1.15), 0.05))

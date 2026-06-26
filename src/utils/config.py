@@ -9,18 +9,13 @@ logger = get_logger(__name__)
 load_dotenv()
 
 def load_dataset_today() -> datetime.date:
-    """Loads the TODAY anchor date from artifacts/dataset_today.txt or returns a fallback."""
+    """Loads the TODAY anchor date from artifacts/dataset_today.txt or fails loudly."""
     path = "artifacts/dataset_today.txt"
-    if os.path.exists(path):
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                date_str = f.read().strip()
-            if date_str:
-                return datetime.date.fromisoformat(date_str)
-        except Exception as e:
-            logger.warning(f"Failed to parse dataset_today.txt: {e}. Using fallback.")
-    # Fallback date if file doesn't exist yet or is malformed
-    return datetime.date(2026, 6, 26)
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Required dataset today anchor file not found: {path}")
+    with open(path, "r", encoding="utf-8") as f:
+        date_str = f.read().strip()
+    return datetime.date.fromisoformat(date_str)
 
 class Config:
     APP_ENV = os.getenv("APP_ENV", "prod").lower()
