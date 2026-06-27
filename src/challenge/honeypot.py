@@ -168,3 +168,91 @@ def honeypot_penalty(raw: Dict[str, Any]) -> float:
 
 def is_structural_honeypot(raw: Dict[str, Any], threshold: float = 0.55) -> bool:
     return honeypot_risk(raw) >= threshold
+
+
+def is_keyword_stuffer(raw: Dict[str, Any]) -> bool:
+    profile = raw.get("profile", {})
+    skills = raw.get("skills", []) or []
+    history = raw.get("career_history", []) or []
+    signals = raw.get("redrob_signals", {}) or {}
+    assessments = signals.get("skill_assessment_scores", {}) or {}
+
+    current_title = (profile.get("current_title") or "").lower().strip()
+    
+    # 1. Define title classes
+    RELEVANT_TITLE_TERMS = {
+        "ml engineer", "machine learning", "ai engineer", "applied scientist",
+        "applied ml", "nlp engineer", "data scientist", "search engineer",
+        "recommendation systems", "recsys", "research engineer", "ai research",
+        "ai specialist", "deep learning"
+    }
+    ADJACENT_TITLE_TERMS = {
+        "software engineer", "backend engineer", "data engineer", "analytics engineer",
+        "full stack", "platform engineer", "staff engineer", "senior software"
+    }
+    NONTECH_TITLE_TERMS = {
+        "hr manager", "marketing manager", "content writer", "graphic designer",
+        "accountant", "sales executive", "customer support", "operations manager",
+        "business analyst", "project manager", "civil engineer", "mechanical engineer",
+        "qa engineer"
+    }
+    OFFDOMAIN_TITLE_TERMS = {"computer vision", "cv engineer", "speech", "robotics"}
+    
+    def get_title_class(title):
+        t = title.lower()
+        if any(term in t for term in RELEVANT_TITLE_TERMS):
+            return "relevant"
+        if any(term in t for term in OFFDOMAIN_TITLE_TERMS):
+            return "offdomain"
+        if any(term in t for term in NONTECH_TITLE_TERMS):
+            return "nontech"
+        if any(term in t for term in ADJACENT_TITLE_TERMS):
+            return "adjacent"
+        return "other"
+
+    current_class = get_title_class(current_title)
+    if current_class not in ("nontech", "offdomain"):
+        return False
+        
+    # 2. Count AI skills listed
+    from src.features.heuristic_extractor import TIER_1_SKILLS
+    ai_skill_count = sum(1 for s in skills if (s.get("name") or "").lower().strip() in TIER_1_SKILLS)
+    if ai_skill_count < 3:
+        return False
+
+    # 3. Check if they ever held a tech role in their history or current title
+    all_titles = [current_title] + [(job.get("title") or "").lower().strip() for job in history]
+    held_tech_role = any(
+        any(term in t for term in RELEVANT_TITLE_TERMS) or any(term in t for term in ADJACENT_TITLE_TERMS)
+        for t in all_titles
+    )
+    if held_tech_role:
+        return False
+
+    # 4. Count AI evidence in narrative (headline, summary, history descriptions)
+    narrative = " ".join([
+        profile.get("headline", ""),
+        profile.get("summary", ""),
+        " ".join(job.get("description", "") for job in history)
+    ]).lower()
+    
+    evidence_count = sum(1 for term in TIER_1_SKILLS if term in narrative)
+    if evidence_count >= 3:
+        return False
+
+    # 5. Check if they have any verified assessment >= 60
+    has_verified = any(
+        (val is not None and float(val) >= 60.0)
+        for name, val in assessments.items()
+        if name.lower().strip() in TIER_1_SKILLS
+    )
+    if has_verified:
+        return False
+
+    return True
+
+
+def stuffer_penalty(raw: Dict[str, Any]) -> float:
+    if is_keyword_stuffer(raw):
+        return 0.05
+    return 1.0

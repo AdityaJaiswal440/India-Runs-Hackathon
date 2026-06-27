@@ -36,7 +36,7 @@ from challenge.features import (
     semantic_score,
 )
 from challenge.semantic import jd_tfidf_similarity
-from challenge.honeypot import honeypot_risk, risk_to_penalty
+from challenge.honeypot import honeypot_risk, risk_to_penalty, stuffer_penalty
 from challenge.jd_config import (
     CONSULTING_FIRMS,
     CORE_SKILL_PHRASES,
@@ -807,6 +807,7 @@ def score_candidate(
         * _framework_penalty(core_ir_n, idx)
         * _weak_title_penalty(profile.get("current_title", ""), core_ir_n, noise_n)
         * _job_hopping_penalty(history)
+        * stuffer_penalty(raw)
     )
 
     raw_final = base * modifiers
