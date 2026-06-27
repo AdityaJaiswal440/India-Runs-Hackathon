@@ -261,6 +261,73 @@ def _job_hopping_penalty(history: List[Dict[str, Any]]) -> float:
     return 1.0
 
 
+def _parse_date(date_str: str):
+    if not date_str:
+        return None
+    try:
+        parts = [int(p) for p in date_str.split("-")[:3]]
+        if len(parts) == 3:
+            from datetime import date
+            return date(parts[0], parts[1], parts[2])
+    except:
+        pass
+    return None
+
+
+def _no_recent_coding_penalty(history: List[Dict[str, Any]]) -> float:
+    """
+    JD explicit: 'Candidates who haven't written production code in the last 18+ months.'
+    Check if the candidate has any engineering/coding activity in the last 18 months
+    relative to reference date 2026-06-22.
+    """
+    if not history:
+        return 0.6
+        
+    from datetime import date
+    ref_date = date(2026, 6, 22)
+    
+    CODING_TITLES = {
+        "engineer", "developer", "coder", "programmer", "architect", 
+        "scientist", "tech lead", "software", "specialist"
+    }
+    
+    CODING_KEYWORDS = {
+        "code", "coding", "python", "write", "writing", "implement", "implementing",
+        "build", "building", "develop", "developing", "deploy", "deploying",
+        "shipped", "shipping", "engineered", "architected", "programming",
+        "tensorflow", "pytorch", "scikit", "spark", "sql", "java", "c++", "rust", "git"
+    }
+    
+    has_recent_coding = False
+    for job in history:
+        is_current = bool(job.get("is_current"))
+        if is_current:
+            is_recent = True
+        else:
+            end = _parse_date(job.get("end_date") or "")
+            if end:
+                is_recent = (ref_date - end).days <= 548
+            else:
+                is_recent = False
+                
+        if is_recent:
+            title = (job.get("title") or "").lower()
+            desc = (job.get("description") or "").lower()
+            
+            if any(t in title for t in CODING_TITLES):
+                has_recent_coding = True
+                break
+                
+            if any(kw in desc for kw in CODING_KEYWORDS):
+                has_recent_coding = True
+                break
+                
+    if not has_recent_coding:
+        return 0.6
+        
+    return 1.0
+
+
 
 def _consulting_current_penalty(profile: Dict[str, Any]) -> float:
     co = norm_text(profile.get("current_company", ""))
@@ -808,6 +875,7 @@ def score_candidate(
         * _weak_title_penalty(profile.get("current_title", ""), core_ir_n, noise_n)
         * _job_hopping_penalty(history)
         * stuffer_penalty(raw)
+        * _no_recent_coding_penalty(history)
     )
 
     raw_final = base * modifiers
