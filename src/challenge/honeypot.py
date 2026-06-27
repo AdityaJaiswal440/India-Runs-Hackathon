@@ -144,6 +144,41 @@ def honeypot_risk(raw: Dict[str, Any]) -> float:
         if expert_n >= 8:
             risk = max(risk, 0.75)
 
+    # Rule 10 — YoE vs Actual Career Duration discrepancy (assimilated from Praveen-ing)
+    total_months = sum(int(job.get("duration_months", 0) or 0) for job in history)
+    career_yoe = total_months / 12.0
+    if claimed > 5.0 and career_yoe < 1.0:
+        risk = max(risk, 0.9)
+    if career_yoe > claimed + 5.0:
+        risk = max(risk, 0.9)
+
+    # Rule 11 — Shannon Entropy Anomaly Checker (assimilated from Praveen-ing)
+    candidate_words = []
+    for s in skills:
+        if s and s.get("name"):
+            candidate_words.append(s["name"].lower())
+    for job in history:
+        if job:
+            candidate_words.append((job.get("title") or "").lower())
+            candidate_words.append((job.get("description") or "").lower())
+    full_profile_text = " ".join(candidate_words)
+    
+    import math
+    import re
+    words = re.findall(r'\b\w+\b', full_profile_text)
+    if words:
+        total_words = len(words)
+        counts = {}
+        for w in words:
+            counts[w] = counts.get(w, 0) + 1
+        entropy = 0.0
+        for count in counts.values():
+            p = count / total_words
+            entropy -= p * math.log2(p)
+            
+        if entropy < 2.2:
+            risk = max(risk, 0.95)
+
     return min(1.0, risk)
 
 
