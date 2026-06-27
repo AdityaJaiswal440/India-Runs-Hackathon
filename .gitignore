@@ -39,3 +39,11 @@ artifacts/candidate_embeddings.npy
 !artifacts/features.parquet
 !artifacts/candidate_ids.pkl
 !artifacts/dataset_today.txt
+
+# Competitor Analysis Safety Blocks
+competitor_analysis/
+*_before.csv
+TEARDOWN_REPORT.md
+scripts/verify_parity.py
+scripts/compare_submissions.py
+scratch_*.py
