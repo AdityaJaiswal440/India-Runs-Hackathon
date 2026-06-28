@@ -1,62 +1,77 @@
-# src/pipeline.py
+"""Ranking pipeline entry point.
+
+Orchestrates the full offline ranking run:
+  1. Load pre-computed embeddings from artifacts/
+  2. Stream candidates from data/raw/candidates.jsonl
+  3. Score and rank using the hybrid ranker
+  4. Write submission.csv with ASCII-safe reasoning strings
 """
-Pipeline Orchestrator for 100% RecruitGPT X parity.
-"""
+
+import csv
 import os
 import sys
-import csv
 from pathlib import Path
 
-# Add src/ and project root to path
-src_dir = os.path.abspath(os.path.dirname(__file__))
-if src_dir not in sys.path:
-    sys.path.insert(0, src_dir)
+# Ensure src/ is on the import path when invoked directly
+_src_dir = os.path.abspath(os.path.dirname(__file__))
+if _src_dir not in sys.path:
+    sys.path.insert(0, _src_dir)
 
-root_dir = os.path.abspath(os.path.join(src_dir, ".."))
-if root_dir not in sys.path:
-    sys.path.insert(0, root_dir)
+_root_dir = os.path.abspath(os.path.join(_src_dir, ".."))
+if _root_dir not in sys.path:
+    sys.path.insert(0, _root_dir)
 
-# Competitor uses these env variables
-os.environ["RANKER_USE_CROSS_ENCODER"] = "0"
-os.environ["RANKER_REQUIRE_EMBEDDINGS"] = "1"
+# Canonical submission uses bi-encoder only (deterministic, network-off)
+os.environ.setdefault("RANKER_USE_CROSS_ENCODER", "0")
+os.environ.setdefault("RANKER_REQUIRE_EMBEDDINGS", "1")
 
-from challenge.redrob_ranker import rank_candidates
-from challenge.embeddings import EmbeddingStore
-from src.utils.logger import get_logger
+from challenge.redrob_ranker import rank_candidates  # noqa: E402
+from src.utils.logger import get_logger              # noqa: E402
 
 logger = get_logger("pipeline")
 
-def main():
-    logger.info("=== Initializing Redrob Ranking Pipeline (Online Phase — Parity V5) ===")
-    
+_NON_ASCII_MAP = str.maketrans({
+    "\u2014": "-",   # em dash
+    "\u00b7": "-",   # middle dot
+    "\u2026": "...", # ellipsis
+    "\u201c": '"',   # left double quote
+    "\u201d": '"',   # right double quote
+    "\u2018": "'",   # left single quote
+    "\u2019": "'",   # right single quote
+})
+
+
+def _ascii_reasoning(text: str) -> str:
+    """Replace common Unicode typographic characters then hard-enforce ASCII."""
+    return text.translate(_NON_ASCII_MAP).encode("ascii", "ignore").decode("ascii")
+
+
+def main() -> None:
+    logger.info("=== Redrob Ranking Pipeline — starting ===")
+
     candidates_path = "data/raw/candidates.jsonl"
-    out_path = "submission.csv"
-    
+    out_path = Path("submission.csv")
+
     logger.info(f"Ranking candidates from: {candidates_path}")
     top_candidates = rank_candidates(candidates_path, top_k=100)
-    
-    logger.info(f"Writing top {len(top_candidates)} rows to {out_path} with 6-decimal score precision...")
-    out_path = Path(out_path)
+
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["candidate_id", "rank", "score", "reasoning"])
+        writer = csv.writer(f)
+        writer.writerow(["candidate_id", "rank", "score", "reasoning"])
         for i, row in enumerate(top_candidates):
-            reasoning = row.reasoning
-            # Surgically replace common non-ASCII characters to preserve text flow
-            reasoning = reasoning.replace("—", "-")
-            reasoning = reasoning.replace("·", "-")
-            reasoning = reasoning.replace("…", "...")
-            reasoning = reasoning.replace("“", '"')
-            reasoning = reasoning.replace("”", '"')
-            reasoning = reasoning.replace("’", "'")
-            reasoning = reasoning.replace("‘", "'")
-            # Strict ASCII enforcement fallback
-            reasoning = reasoning.encode("ascii", "ignore").decode("ascii")
-            
-            w.writerow([row.candidate_id, i + 1, f"{row.score:.6f}", reasoning])
-            
-    logger.info(f"=== Pipeline Complete. Top candidate: {top_candidates[0].candidate_id} with score {top_candidates[0].score:.6f} ===")
+            writer.writerow([
+                row.candidate_id,
+                i + 1,
+                f"{row.score:.6f}",
+                _ascii_reasoning(row.reasoning),
+            ])
+
+    logger.info(
+        f"=== Pipeline complete — top candidate: {top_candidates[0].candidate_id} "
+        f"score {top_candidates[0].score:.6f} ==="
+    )
+
 
 if __name__ == "__main__":
     main()
