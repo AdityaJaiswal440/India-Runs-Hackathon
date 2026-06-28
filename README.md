@@ -52,11 +52,16 @@ India-Runs-Hackathon/
 We have provided a FastAPI sandbox so judges can easily evaluate the model in an isolated environment by uploading `.jsonl` payloads and receiving immediate rankings.
 
 **Step 1: Start the Sandbox Server**
-You can launch the API natively or inside Docker. To run it natively:
+You can launch the API natively or run it isolated inside Docker.
+
+*Option A: Run inside Docker (Recommended)*
 ```bash
-# Activate the environment
+make sandbox
+```
+
+*Option B: Run Natively*
+```bash
 source .venv/bin/activate
-# Start the FastAPI server
 uvicorn sandbox.app:app --host 0.0.0.0 --port 8000
 ```
 *The server will boot up and load the ranking logic on `http://localhost:8000`.*
