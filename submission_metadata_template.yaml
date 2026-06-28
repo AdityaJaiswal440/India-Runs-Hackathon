@@ -38,11 +38,11 @@ reproduce_command: "make gameday"
 # Compute environment
 # ============================================================================
 compute:
-  platform: "Local Linux box"                   # Or: "AWS EC2 c5.4xlarge", "Local Linux box", etc.
-  cpu_cores: 8                                  # Number of CPU cores used
+  platform: "Docker (Restricted Sandbox)"       # Or: "AWS EC2 c5.4xlarge", "Local Linux box", etc.
+  cpu_cores: 1                                  # Number of CPU cores used
   ram_gb: 16                                    # Available RAM in GB
-  python_version: "3.13.9"                      # python --version
-  os: "Ubuntu 22.04 LTS"                        # Or "macOS 14.2", etc.
+  python_version: "3.11.9"                      # python --version
+  os: "Debian GNU/Linux 12 (bookworm)"          # Or "macOS 14.2", etc.
   uses_gpu_for_inference: false                 # Must be false — see compute constraints
   has_network_during_ranking: false             # Must be false — no API calls during ranking
   pre_computation_required: true                # true if you pre-compute embeddings or train models offline
@@ -57,9 +57,11 @@ compute:
 ai_tools_used:
   - "Gemini"
   - "Claude"
+  - "z.ai"
+  - "Antigravity"
 
 ai_usage_summary: |
-  Used Gemini for code optimization, debugging tests, dependency management, and writing documentation. Used Claude for architectural guidance. No candidate data was fed to external APIs.
+  Used Antigravity for code optimization, debugging tests, dependency management, and writing documentation. Used Claude for architectural guidance. No candidate data was fed to external APIs.
 
 # ============================================================================
 # Approach summary (optional but recommended)
