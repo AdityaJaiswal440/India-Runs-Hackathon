@@ -90,6 +90,57 @@ def count_phrases_fast(
     return hits
 
 
+def align_to_word_start(text: str, pos: int) -> int:
+    """Advance pos forward to the next word boundary if it lands mid-token."""
+    if pos <= 0 or pos >= len(text):
+        return max(0, pos)
+    if not text[pos - 1].isalnum() or not text[pos].isalnum():
+        return pos
+    ws = text.find(" ", pos)
+    return pos if ws == -1 else min(ws + 1, len(text))
+
+
+def align_to_word_end(text: str, pos: int) -> int:
+    """Retreat pos backward to the previous word boundary if it lands mid-token."""
+    if pos <= 0:
+        return 0
+    if pos >= len(text):
+        return len(text)
+    if not text[pos - 1].isalnum() or not text[pos].isalnum():
+        return pos
+    sp = text.rfind(" ", 0, pos)
+    return sp if sp >= 0 else 0
+
+
+_COMPLETE_SUFFIX = re.compile(
+    r"(?:ing|tion|ment|ness|ally|ious|able|ive|ers?|ed|ly|ds|ms|cs|us|um|es|or|al|ic|on|s)$",
+    re.I,
+)
+
+
+def strip_trailing_partial_token(chunk: str) -> str:
+    """Drop an incomplete token before a terminal ellipsis (e.g. 'evolvin…' → '…')."""
+    if not chunk.endswith("\u2026"):
+        return chunk
+    body = chunk[:-1].rstrip()
+    if not body or not body[-1].isalnum():
+        return chunk
+    prefix = "\u2026" if chunk.startswith("\u2026") else ""
+    core = body[1:] if prefix else body
+    words = core.split()
+    if not words:
+        return chunk
+    last = words[-1]
+    if not last[-1].isalnum():
+        return chunk
+    if _COMPLETE_SUFFIX.search(last):
+        return chunk
+    trimmed = " ".join(words[:-1]).strip()
+    if prefix:
+        return f"\u2026{trimmed}\u2026" if trimmed else "\u2026"
+    return f"{trimmed}\u2026" if trimmed else "\u2026"
+
+
 def count_phrases(phrases: Iterable[str], text: str) -> int:
     """Convenience wrapper: count phrase hits without pre-splitting."""
     singles, multi = split_phrases(tuple(phrases))
