@@ -147,19 +147,20 @@ def main():
         # Lowercase the reasoning for matching
         reasoning_lower = row["reasoning"].lower()
 
-        # Check each taxonomy term: if it appears in the reasoning,
-        # it MUST be grounded in the candidate's profile
+        # Check each taxonomy term (now compiled with \b boundaries):
+        # if it appears in the reasoning, it MUST be grounded in the candidate's profile
         for term in JD_TAXONOMY:
-            if term in reasoning_lower:
+            if re.search(term, reasoning_lower):
                 # This technical term was claimed in the reasoning.
-                # Verify it exists in the candidate's skills, companies,
-                # or anywhere in the raw candidate profile string.
-                if term in valid_candidate_entities:
+                # Since term is a regex with \b, we need to extract the raw skill name 
+                # (removing the \b markers) to check valid_candidate_entities.
+                raw_term = term.replace(r"\b", "")
+                if raw_term in valid_candidate_entities:
                     continue
-                if term in candidate_text:
+                if re.search(term, candidate_text):
                     continue
                 # Hard hallucination: taxonomy term claimed but not in profile
-                print(f"[FAIL] Hallucination in {cid}: taxonomy term '{term}' "
+                print(f"[FAIL] Hallucination in {cid}: taxonomy term '{raw_term}' "
                       f"found in reasoning but not in candidate profile")
                 sys.exit(1)
 

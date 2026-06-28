@@ -2,12 +2,19 @@
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import heapq
 import json
+import re
+import sys
 from dataclasses import dataclass, field
+from datetime import date
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
+from config.defaults import RANKING_REFERENCE_DATE
+from challenge.honeypot import _career_span_years, honeypot_risk, risk_to_penalty, stuffer_penalty
 from challenge.career_blurb import (
     build_career_blurb_counts_from_path,
     template_blurb_modifier,
@@ -36,7 +43,6 @@ from challenge.features import (
     semantic_score,
 )
 from challenge.semantic import jd_tfidf_similarity
-from challenge.honeypot import honeypot_risk, risk_to_penalty, stuffer_penalty
 from challenge.jd_config import (
     CAREER_JD_WEIGHTS,
     CONSULTING_FIRMS,
@@ -178,8 +184,6 @@ def _title_score(title: str, history: List[Dict[str, Any]]) -> float:
 
 
 def _experience_score(years: float, history: List[Dict[str, Any]]) -> float:
-    from challenge.honeypot import _career_span_years
-
     span = _career_span_years(history)
     if span > 0 and years > span * 1.2 + 1.0:
         return 0.15
@@ -284,8 +288,7 @@ def _no_recent_coding_penalty(history: List[Dict[str, Any]]) -> float:
     if not history:
         return 0.6
         
-    from datetime import date
-    ref_date = date(2026, 6, 22)
+    ref_date = RANKING_REFERENCE_DATE
     
     CODING_TITLES = {
         "engineer", "developer", "coder", "programmer", "architect", 
@@ -754,8 +757,6 @@ def _build_reasoning(
     else:
         sentence2 = "Concerns: founding-role scope still needs validation in technical screen."
 
-    import re
-    
     reasoning = f"{sentence1} {sentence2}"
     
     # Grounding check and replacement to satisfy Gate P4
@@ -938,10 +939,7 @@ def rank_candidates(candidates_path, top_k: int = 100) -> List[ScoredCandidate]:
     Ranking pipeline (canonical / Stage 3):
     1) Hybrid score all candidates → keep top RERANK_POOL_SIZE
     2) Optional cross-encoder rerank (RANKER_USE_CROSS_ENCODER=1 only)
-    3) Calibrated top_k with grounded reasoning
     """
-    import sys
-
     guard_canonical_embeddings(_embedding_store())
     if cross_encoder_enabled():
         print(
@@ -1010,9 +1008,6 @@ def _calibrate_scores(raw_scores: List[float]) -> List[float]:
 
 
 def write_submission(rows: List[ScoredCandidate], out_path) -> None:
-    import csv
-    from pathlib import Path
-
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8", newline="") as f:
