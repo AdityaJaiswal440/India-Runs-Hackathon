@@ -1,0 +1,77 @@
+# Redrob Hackathon — Submission Metadata Template
+#
+# Copy this file to your repo root as `submission_metadata.yaml` and fill it in.
+# The fields here should match what you submit via the portal at upload time.
+# Stage 3 review uses this file to verify your portal metadata.
+
+# ============================================================================
+# Team identity
+# ============================================================================
+team_name: "ERA"  # Used in leaderboard and announcements
+
+primary_contact:
+  name: "Shruti Verma"
+  email: "shruti.verma_btech23@gsv.ac.in"   # Used for all organizer communication
+  phone: "+91-9340981604"        # Used for top-50 / top-10 outreach
+
+team_members:
+  - name: "Aditya Jaiswal"
+    email: "aditya.kumar_btech24@gsv.ac.in"
+    role: "ML Engineer"          # Optional, e.g. "Team Lead", "Backend", "Data"
+
+  - name: "Aryan Thakur"
+    email: "aryan.thakur_btech23@gsv.ac.in"
+    role: "Backend Engineer" 
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "https://github.com/AdityaJaiswal440/India-Runs-Hackathon"
+# Required. Must be reachable. Private repos OK if you can grant organizer
+# access at Stage 3 (the email to add will be communicated then).
+
+sandbox_link: "https://hub.docker.com/r/3aryan8/india-runs-hackthon"
+
+reproduce_command: "make gameday"
+
+
+# ============================================================================
+# Compute environment
+# ============================================================================
+compute:
+  platform: "Local Linux box"                   # Or: "AWS EC2 c5.4xlarge", "Local Linux box", etc.
+  cpu_cores: 8                                  # Number of CPU cores used
+  ram_gb: 16                                    # Available RAM in GB
+  python_version: "3.13.9"                      # python --version
+  os: "Ubuntu 22.04 LTS"                        # Or "macOS 14.2", etc.
+  uses_gpu_for_inference: false                 # Must be false — see compute constraints
+  has_network_during_ranking: false             # Must be false — no API calls during ranking
+  pre_computation_required: true                # true if you pre-compute embeddings or train models offline
+  pre_computation_time_minutes: 5               # Approximate, if applicable
+
+# ============================================================================
+# AI tools declaration
+# ============================================================================
+# Transparency only — declared use is NOT penalized. Be honest. Stage 5 interview
+# may verify these declarations against your code; declarations that contradict
+# your code or your interview are flagged.
+ai_tools_used:
+  - "Gemini"
+  - "Claude"
+
+ai_usage_summary: |
+  Used Gemini for code optimization, debugging tests, dependency management, and writing documentation. Used Claude for architectural guidance. No candidate data was fed to external APIs.
+
+# ============================================================================
+# Approach summary (optional but recommended)
+# ============================================================================
+methodology_summary: |
+    Two-phase hybrid ranking pipeline processing 100,000 candidate profiles against a Senior AI Engineer JD. Phase 1 (offline, ~5 min on CPU) streams candidates, derives a temporal anchor, builds a vocabulary-pruned BM25 index (frequency ≥2), and generates 384-dim dense embeddings (all-MiniLM-L6-v2) against a HyDE-style ideal-resume anchor; BM25, dense, and career-keyword signals are fused via Reciprocal Rank Fusion (k=60).Phase 2 (online, ~1.2s) scores each candidate across 10 positive dimensions — skills, title, career semantic, production ownership, assessment, availability, location, education, experience, and engagement — with an optional cross-encoder rerank over the top 500 candidates. A 27-rule honeypot engine then applies multiplicative demotion: Shannon entropy <2.2 flags templated/synthetic text, company founding-year cross-references catch timeline paradoxes, and anachronistic-technology checks catch impossible experience claims;flagged profiles are demoted to a hard 0.0 score.Output is the top 100 candidates with deterministic multi-key tie-breaking, 6-decimal score precision, and reasoning text that is template-built and token-validated against each candidate's own profile to prevent hallucinated justifications.
+# ============================================================================
+# Declarations
+# ============================================================================
+declarations:
+  read_submission_spec: true        # I have read submission_spec.md in full
+  code_is_original_work: true       # My code is my team's original work (using AI as a tool is fine)
+  no_collusion: true                # I have not coordinated my submission with other teams
+  honeypot_check_done: true         # OPTIONAL — set true if you explicitly checked for honeypots in your ranking
+  reproduction_tested: true         # I have tested that my reproduce_command runs end-to-end
