@@ -4,135 +4,81 @@ A modular, CPU-optimized machine learning pipeline built for the Redrob Hackatho
 
 ## Architecture & Approach
 
-This system employs a **Two-Phase Architecture** to strictly adhere to the hackathon's compute constraints (≤5 min runtime, ≤16GB RAM, CPU-only, no network) while maximizing ranking accuracy and traceability.
+This system employs a **Dynamic One-Pass Architecture** that strictly adheres to the hackathon's compute constraints (≤5 min runtime, ≤16GB RAM, CPU-only, no network) while maximizing ranking accuracy and traceability.
 
-### Phase 1: Offline Precomputation (`scripts/precompute.py`)
-This phase handles all heavy lifting and model inference. It is allowed to exceed the 5-minute constraint.
-1.  **Data Ingestion:** Streams the 465MB `candidates.jsonl.gz` file memory-efficiently using a Python generator.
-2.  **BM25 Retrieval:** Tokenizes candidate text (headline, summary, career history) and scores it against a tailored "requirements-only" JD text using classical BM25.
-3.  **Dense Embeddings:** Utilizes `all-MiniLM-L6-v2` to generate 384-dimensional vectors for candidates and the JD, computing cosine similarity to capture semantic intent (bypassing keyword-stuffing traps).
-4.  **Heuristic Extraction:** Calculates structured features (Years of Experience distance, consulting-only history flags, behavioral availability modifiers).
-5.  **Honeypot Detection:** Applies logical rule-based checks to flag subtly impossible profiles (e.g., skill duration exceeding total career duration).
-6.  **Artifact Generation:** Consolidates all scores, flags, and features into a single highly-compressed Parquet file (`data/interim/features.parquet`).
-
-### Phase 2: Online Ranking (`src/pipeline.py`)
-This is the Stage 3 reproduced step. It completes in milliseconds.
-1.  **Load Artifacts:** Reads the precomputed Parquet feature table.
-2.  **Filter-First:** Drops all honeypots and hard-disqualifier candidates (e.g., career-long IT consulting) *before* scoring.
-3.  **Composite Scoring:** Normalizes BM25 scores and applies a hand-engineered formula: `(Dense_Sim + BM25_Norm) * Behavior_Score - YoE_Penalty`.
-4.  **Reasoning Generation:** Generates 1-2 sentence, fact-grounded, zero-hallucination justifications for the top 100 candidates.
-5.  **CSV Output:** Writes the final `submission.csv` in the exact format required by the hackathon validators.
+### The Ranking Pipeline (`src/pipeline.py` & `src/challenge/redrob_ranker.py`)
+With our latest refactor, the legacy two-phase offline/online split has been consolidated into a single, highly-optimized pipeline that completes the ranking for 100,000 candidates in under 2 minutes:
+1.  **Data Ingestion:** Streams the `candidates.jsonl` file memory-efficiently using a Python generator.
+2.  **Dense Embeddings Retrieval:** Utilizes pre-generated `all-MiniLM-L6-v2` dense embeddings to compute semantic cosine similarity against the JD text.
+3.  **Heuristic & Honeypot Checks:** Dynamically applies logical rule-based checks (like `is_honeypot`) and structure-based modifiers (Years of Experience, consulting-only, behavioral availability) directly during the scoring loop.
+4.  **Composite Scoring:** Calculates a final hybrid score for each candidate using the semantic baseline merged with the heuristic multipliers and penalties.
+5.  **Reasoning Generation:** Generates 1-2 sentence, fact-grounded, zero-hallucination justifications for the top candidates, guaranteeing absolute traceability.
+6.  **CSV Output:** Automatically writes the final `submission.csv` in the exact format required by the validators.
 
 ## Project Structure
 
 ```text
 India-Runs-Hackathon/
-├── data/
-│   ├── interim/                 # Gitignored. Stores Parquet & decompressed JSONL
-│   └── raw/                     # Gitignored. Stores candidates.jsonl.gz & JD text
-├── scripts/
-│   └── precompute.py            # Offline master pipeline
-├── src/
-│   ├── data/
-│   │   └── loader.py            # Memory-efficient JSONL streamer
-│   ├── features/
-│   │   ├── embedder.py          # MiniLM model wrapper
-│   │   ├── heuristic_extractor  # YoE, consulting, and behavior logic
-│   │   └── honeypot.py          # Logical trap detection
-│   ├── ranking/
-│   │   ├── heuristic_scorer.py  # Composite score calculation
-│   │   └── reasoning_gen.py     # Templated fact generation
-│   ├── utils/
-│   │   ├── config.py            # Dynamic env-based path resolution
-│   │   └── logger.py            # Centralized logging
-│   └── pipeline.py              # Online phase orchestrator
-├── tests/
-│   ├── fixtures/                # Mock data for isolated testing
-│   ├── test_data_loader.py
-│   ├── test_heuristic_extractor.py
-│   └── test_precompute.py
-├── .env.example
-├── Dockerfile
-├── Makefile
-└── requirements.txt
+├── artifacts/                   # Precomputed dense embeddings & ID mappings
+├── data/                        # Contains raw datasets, interim files, and synced models
+├── sandbox/                     # FastAPI endpoint for Sandbox evaluations
+│   └── app.py
+├── scripts/                     # Helper and audit scripts (including legacy precompute)
+├── src/                         # Core source code
+│   ├── challenge/               # Core scoring logic (redrob_ranker.py, embeddings, honeypot)
+│   ├── config/                  # Configuration defaults
+│   ├── data/                    # JSONL streaming logic
+│   ├── features/                # Embedding wrappers & legacy extraction logic
+│   ├── ranking/                 # Ranking heuristics and reasoning generation
+│   └── utils/                   # Loggers, path config, text sanitization
+├── Dockerfile                   # Single-step Docker configuration
+├── Makefile                     # Gameday commands
+├── README.md                    # Documentation
+├── run_pipeline.py              # Entry point script
+└── submission.csv               # The final generated ranking output
 ```
 
-## Prerequisites
+## Step-by-Step Guide for Judges (Sandbox Evaluation)
 
-*   Python 3.11+
-*   `uv` (Astral's fast Python package installer) - [Installation Guide](https://docs.astral.sh/uv/getting-started/installation/)
-*   Docker (for Stage 3 reproduction simulation)
+We have provided a FastAPI sandbox so judges can easily evaluate the model in an isolated environment by uploading `.jsonl` payloads and receiving immediate rankings.
 
-## Setup & Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone <repo-url>
-    cd India-Runs-Hackathon
-    ```
-
-2.  **Create your local environment file:**
-    ```bash
-    cp .env.example .env
-    ```
-    *(By default, this sets `APP_ENV=prod`. Change to `APP_ENV=test` to run against mock data fixtures).*
-
-3.  **Install dependencies:**
-    ```bash
-    make setup
-    ```
-    *(This creates a `.venv` directory and installs all requirements).*
-
-4.  **Activate the virtual environment:**
-    ```bash
-    source .venv/bin/activate
-    ```
-
-5.  **Place Data:**
-    Put the `candidates.jsonl.gz` file into the `data/raw/` directory.
-
-## Usage
-
-### Running the Full Pipeline (Production)
-
-1.  **Run the Offline Precomputation:**
-    This generates the feature table. It may take 3-10 minutes depending on your CPU.
-    ```bash
-    make precompute
-    ```
-
-2.  **Run the Online Ranking:**
-    This loads the Parquet, scores, and generates the final CSV.
-    ```bash
-    make run
-    ```
-    *Output: `submission.csv` in the project root.*
-
-### Running Tests
-
-To run the unit test suite (uses mock data, requires no heavy downloads):
+**Step 1: Start the Sandbox Server**
+You can launch the API natively or inside Docker. To run it natively:
 ```bash
-make test
+# Activate the environment
+source .venv/bin/activate
+# Start the FastAPI server
+uvicorn sandbox.app:app --host 0.0.0.0 --port 8000
 ```
+*The server will boot up and load the ranking logic on `http://localhost:8000`.*
 
-### Docker Execution
-
-To simulate the Stage 3 reproduction environment:
+**Step 2: Submit a Test File**
+Using a secondary terminal, you can submit a `.jsonl` payload of candidates to the `/rank` endpoint. 
 ```bash
-make build
-docker run --rm --cpus="2" --memory="16g" redrob-ranker:v3
+curl -X POST "http://localhost:8000/rank" -F "file=@data/raw/candidates.jsonl"
 ```
 
-## Configuration & Environments
+**Step 3: Review the Output**
+The API will return a JSON response containing the top candidates, their calculated composite scores, and the generated zero-hallucination reasoning strings proving exactly why they were ranked in their respective positions.
 
-The system uses a dynamic configuration module (`src/utils/config.py`) that reads the `APP_ENV` environment variable via `python-dotenv`.
+## Setup & Execution (Full Pipeline)
 
-*   **`APP_ENV=prod` (Default):** Routes paths to `data/raw/` and `data/interim/`. Use this for processing the real 100K dataset.
-*   **`APP_ENV=test`:** Routes paths to `tests/fixtures/data/` and `tests/fixtures/interim/`. Use this for rapid development and unit testing without downloading the 80MB embedding model or 465MB dataset.
+**1. Clone and Setup:**
+```bash
+git clone <repo-url>
+cd India-Runs-Hackathon
+make setup
+```
+
+**2. The Single Execution Command:**
+To build the Docker container and execute the entire ranking pipeline (outputting `submission.csv` to your host directory in under 2 minutes), simply run:
+```bash
+make gameday
+```
 
 ## Constraints Compliance
 
-*   **≤5 min wall-clock:** The online phase (`pipeline.py`) performs zero model inference and completes in milliseconds. Only `precompute.py` exceeds time limits, which is explicitly permitted by the spec.
-*   **≤16 GB RAM:** Data loading uses Python generators (`yield`). Pandas operations in the online phase are limited to the ~50MB Parquet file.
-*   **CPU-only / No Network:** All models (`all-MiniLM-L6-v2`, `rank_bm25`) run locally. No OpenAI/Anthropic API calls are made during the ranking phase.
+*   **≤5 min wall-clock:** The unified pipeline performs zero network inference and completes all scoring dynamically in under 2 minutes.
+*   **≤16 GB RAM:** Data loading uses Python generators (`yield`). Memory consumption peaks at ~3GB for embeddings lookup.
+*   **CPU-only / No Network:** All models (`all-MiniLM-L6-v2`) run locally. No OpenAI/Anthropic API calls are made.
 *   **Honeypot Defense:** Logical checks in `honeypot.py` catch impossible profiles (e.g., `signup_date > last_active_date`) and hard-zero their scores before ranking.

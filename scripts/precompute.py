@@ -25,7 +25,7 @@ from src.utils.config import Config
 from src.utils.logger import get_logger
 from src.data.loader import stream_candidates
 from src.features.embedder import Embedder
-from challenge.honeypot import is_honeypot, safe_date
+from src.challenge.honeypot import is_honeypot, safe_date
 from src.features.heuristic_extractor import (
     compute_skill_match_score,
     compute_skill_gap_coverage,

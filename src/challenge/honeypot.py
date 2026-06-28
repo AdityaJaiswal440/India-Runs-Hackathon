@@ -12,10 +12,10 @@ import re
 from datetime import date
 from typing import Any, Dict, List
 
-from config.defaults import RANKING_REFERENCE_DATE
-from challenge.text_match import norm_text
-from challenge.company_matrix import COMPANY_FOUNDING_YEARS
-from challenge.jd_config import CORE_SKILL_PHRASES, SECONDARY_SKILL_PHRASES
+from src.config.defaults import RANKING_REFERENCE_DATE
+from src.challenge.text_match import norm_text
+from src.challenge.company_matrix import COMPANY_FOUNDING_YEARS
+from src.challenge.jd_config import CORE_SKILL_PHRASES, SECONDARY_SKILL_PHRASES
 
 _REFERENCE_DATE: date = RANKING_REFERENCE_DATE
 

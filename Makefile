@@ -20,5 +20,5 @@ run:
 test:
 	pytest tests/ -v
 
-gameday:
-	docker run --rm --memory="16g" --memory-swap="16g" --cpus="1.0" india-runs-hackthon
+gameday: build
+	docker run --rm -v $(PWD):/app/host --memory="16g" --memory-swap="16g" --cpus="1.0" india-runs-hackthon sh -c "python run_pipeline.py && cp submission.csv /app/host/"

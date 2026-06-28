@@ -21,5 +21,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the codebase into the container
 COPY . .
 
+# Setup embeddings to satisfy the canonical path guard
+RUN mkdir -p data/embeddings && \
+    cp artifacts/embeddings.fp16.npz data/embeddings/ && \
+    cp artifacts/candidate_ids.json data/embeddings/
+
 # Run the pipeline to generate submission.csv as default entrypoint
 CMD ["python", "run_pipeline.py"]

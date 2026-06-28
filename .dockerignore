@@ -9,7 +9,6 @@ __pycache__
 .pytest_cache
 .ipynb_checkpoints
 sandbox/
-artifacts/
 *.csv
 !submission.csv
 *.log

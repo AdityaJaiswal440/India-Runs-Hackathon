@@ -10,6 +10,7 @@ Orchestrates the full offline ranking run:
 import csv
 import os
 import sys
+import time
 from pathlib import Path
 
 # Ensure src/ is on the import path when invoked directly
@@ -47,6 +48,7 @@ def _ascii_reasoning(text: str) -> str:
 
 
 def main() -> None:
+    start_time = time.time()
     logger.info("=== Redrob Ranking Pipeline — starting ===")
 
     candidates_path = "data/raw/candidates.jsonl"
@@ -67,8 +69,9 @@ def main() -> None:
                 _ascii_reasoning(row.reasoning),
             ])
 
+    elapsed = time.time() - start_time
     logger.info(
-        f"=== Pipeline complete — top candidate: {top_candidates[0].candidate_id} "
+        f"=== Pipeline complete in {elapsed:.2f}s — top candidate: {top_candidates[0].candidate_id} "
         f"score {top_candidates[0].score:.6f} ==="
     )
 
