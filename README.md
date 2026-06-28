@@ -26,7 +26,7 @@ This is the Stage 3 reproduced step. It completes in milliseconds.
 ## Project Structure
 
 ```text
-redrob-ranker/
+India-Runs-Hackathon/
 ├── data/
 │   ├── interim/                 # Gitignored. Stores Parquet & decompressed JSONL
 │   └── raw/                     # Gitignored. Stores candidates.jsonl.gz & JD text
@@ -68,7 +68,7 @@ redrob-ranker/
 1.  **Clone the repository:**
     ```bash
     git clone <repo-url>
-    cd redrob-ranker
+    cd India-Runs-Hackathon
     ```
 
 2.  **Create your local environment file:**
@@ -120,7 +120,7 @@ make test
 To simulate the Stage 3 reproduction environment:
 ```bash
 make build
-docker run --rm --cpus="2" --memory="16g" redrob-ranker
+docker run --rm --cpus="2" --memory="16g" redrob-ranker:v3
 ```
 
 ## Configuration & Environments
