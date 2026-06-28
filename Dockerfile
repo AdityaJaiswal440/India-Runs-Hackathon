@@ -26,5 +26,5 @@ RUN mkdir -p data/embeddings && \
     cp artifacts/embeddings.fp16.npz data/embeddings/ && \
     cp artifacts/candidate_ids.json data/embeddings/
 
-# Run the pipeline to generate era.csv as default entrypoint
-CMD ["python", "run_pipeline.py"]
+# Start the Interactive Sandbox API as default entrypoint
+CMD ["uvicorn", "sandbox.app:app", "--host", "0.0.0.0", "--port", "8000"]

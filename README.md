@@ -51,28 +51,23 @@ India-Runs-Hackathon/
 
 We have provided a FastAPI sandbox so judges can easily evaluate the model in an isolated environment by uploading `.jsonl` payloads and receiving immediate rankings.
 
-**Step 1: Start the Sandbox Server**
-You can launch the API instantly using our pre-built Docker Hub image (which comes pre-loaded with the environment, models, and embeddings):
+**Step 1: Start the Interactive Sandbox**
+You can launch the API instantly using our pre-built Docker Hub image (which comes pre-loaded with the environment, models, and embeddings). When you run this, it will not just print logs; it will start a live web server!
 
-*Option A: Pull & Run from Docker Hub (Recommended for Judges)*
 ```bash
 docker run --rm -p 8000:8000 --memory="16g" --memory-swap="16g" --cpus="1.0" 3aryan8/india-runs-hackthon:latest
 ```
 
-*Option B: Run from Local Source Code*
-```bash
-make sandbox
-```
-*The server will boot up and load the ranking logic on `http://localhost:8000`.*
+**Step 2: Test it in your Browser!**
+Once the server is running, you don't need to use the terminal anymore. 
+1. Open your web browser and go to: [http://localhost:8000/docs](http://localhost:8000/docs)
+2. You will see a beautiful Swagger UI. Click on the **`POST /rank`** endpoint.
+3. Click the **"Try it out"** button.
+4. Click **"Choose File"** and upload *any* `.jsonl` candidate file (we have included `data/raw/sample_candidates.jsonl` in the repo for a quick 10-candidate test).
+5. Click **"Execute"**.
 
-**Step 2: Submit a Test File**
-Using a secondary terminal, you can submit a payload of candidates to the `/rank` endpoint. We have included a small 10-candidate sample file in the repo so you can test it instantly without needing the massive 465MB dataset:
-```bash
-curl -X POST "http://localhost:8000/rank" -F "file=@data/raw/sample_candidates.jsonl"
-```
-
-**Step 3: Review the Output**
-The API will return a JSON response containing the top candidates, their calculated composite scores, and the generated zero-hallucination reasoning strings proving exactly why they were ranked in their respective positions.
+**Step 3: Get your `era.csv`**
+The model will instantly compute everything dynamically for your uploaded file. When it finishes, the Swagger UI will present you with a **Download file** link. Clicking it will save the final `era.csv` straight to your computer, complete with the calculated scores and our zero-hallucination reasoning strings!
 
 ## Setup & Execution (Full Pipeline)
 
