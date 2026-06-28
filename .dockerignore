@@ -8,9 +8,14 @@ __pycache__
 *.pyd
 .pytest_cache
 .ipynb_checkpoints
-sandbox/
+models/
+data/*
+!data/raw/
+data/raw/*
+!data/raw/candidates.jsonl
+!data/raw/sample_candidates.jsonl
 *.csv
-!submission.csv
+!era.csv
 *.log
 logs/
 test_out/
