@@ -38,6 +38,7 @@ from challenge.features import (
 from challenge.semantic import jd_tfidf_similarity
 from challenge.honeypot import honeypot_risk, risk_to_penalty, stuffer_penalty
 from challenge.jd_config import (
+    CAREER_JD_WEIGHTS,
     CONSULTING_FIRMS,
     CORE_SKILL_PHRASES,
     CV_SPEECH_ROBOTICS,
@@ -754,7 +755,6 @@ def _build_reasoning(
         sentence2 = "Concerns: founding-role scope still needs validation in technical screen."
 
     import re
-    from src.features.heuristic_extractor import JD_TAXONOMY
     
     reasoning = f"{sentence1} {sentence2}"
     
@@ -787,7 +787,7 @@ def _build_reasoning(
         return "expertise"
 
     # Sort terms by length descending to replace multi-word phrases before single words
-    sorted_terms = sorted(list(JD_TAXONOMY.keys()), key=len, reverse=True)
+    sorted_terms = sorted(list(CAREER_JD_WEIGHTS.keys()), key=len, reverse=True)
     reasoning_lower = reasoning.lower()
     for term in sorted_terms:
         if term in reasoning_lower:
@@ -1005,22 +1005,8 @@ def rank_candidates(candidates_path, top_k: int = 100) -> List[ScoredCandidate]:
 
 
 def _calibrate_scores(raw_scores: List[float]) -> List[float]:
-    """Map model scores → monotonic [0.99, 0.20] preserving real separation."""
-    if not raw_scores:
-        return []
-    lo = min(raw_scores)
-    hi = max(raw_scores)
-    span = hi - lo if hi > lo else 1.0
-    out: List[float] = []
-    for s in raw_scores:
-        norm = (s - lo) / span
-        cal = 0.20 + 0.79 * norm
-        out.append(round(cal, 4))
-    floor = 0.20
-    for i in range(1, len(out)):
-        if out[i] >= out[i - 1]:
-            out[i] = round(max(floor, out[i - 1] - 0.0001), 4)
-    return out
+    """Return raw scores directly without artificial normalization."""
+    return raw_scores
 
 
 def write_submission(rows: List[ScoredCandidate], out_path) -> None:
