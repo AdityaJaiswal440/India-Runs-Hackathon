@@ -9,7 +9,7 @@ def run_systemic_audit():
     
     # 1. Load all system states
     try:
-        submission = pd.read_csv("submission.csv")
+        submission = pd.read_csv("era.csv")
         features = np.load("artifacts/features.npy")
         with open("artifacts/candidate_ids.pkl", "rb") as f:
             c_ids = pickle.load(f)

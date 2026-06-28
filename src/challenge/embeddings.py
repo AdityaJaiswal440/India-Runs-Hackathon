@@ -125,7 +125,7 @@ def guard_canonical_embeddings(store: EmbeddingStore) -> None:
         return
     msg = (
         "Committed embeddings not loaded (expected data/embeddings/embeddings.fp16.npz). "
-        "Ranking would use TF-IDF fallback and produce a DIFFERENT submission.csv. "
+        "Ranking would use TF-IDF fallback and produce a DIFFERENT era.csv. "
         "Mount data/embeddings/ or run ./scripts/reproduce_ranking.sh. "
         "Set RANKER_REQUIRE_EMBEDDINGS=0 only for ablation/diagnostics."
     )

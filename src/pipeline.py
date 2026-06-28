@@ -4,7 +4,7 @@ Orchestrates the full offline ranking run:
   1. Load pre-computed embeddings from artifacts/
   2. Stream candidates from data/raw/candidates.jsonl
   3. Score and rank using the hybrid ranker
-  4. Write submission.csv with ASCII-safe reasoning strings
+  4. Write era.csv with ASCII-safe reasoning strings
 """
 
 import csv
@@ -52,7 +52,7 @@ def main() -> None:
     logger.info("=== Redrob Ranking Pipeline — starting ===")
 
     candidates_path = "data/raw/candidates.jsonl"
-    out_path = Path("submission.csv")
+    out_path = Path("era.csv")
 
     logger.info(f"Ranking candidates from: {candidates_path}")
     top_candidates = rank_candidates(candidates_path, top_k=100)

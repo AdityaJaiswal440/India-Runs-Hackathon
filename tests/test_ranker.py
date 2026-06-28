@@ -466,8 +466,8 @@ def test_cross_encoder_disabled_by_default():
 
 
 def test_submission_artifact_matches_ranker():
-    """Committed submission.csv must be byte-identical to fresh rank.py output."""
-    artifact = ROOT / "submission.csv"
+    """Committed era.csv must be byte-identical to fresh rank.py output."""
+    artifact = ROOT / "era.csv"
     if not artifact.exists() or not CANDIDATES.exists():
         return
     import hashlib
@@ -483,5 +483,5 @@ def test_submission_artifact_matches_ranker():
     write_submission(fresh, out)
     assert hashlib.sha256(artifact.read_bytes()).hexdigest() == hashlib.sha256(
         out.read_bytes()
-    ).hexdigest(), "submission.csv stale vs canonical ranker (CE off)"
+    ).hexdigest(), "era.csv stale vs canonical ranker (CE off)"
     out.unlink(missing_ok=True)

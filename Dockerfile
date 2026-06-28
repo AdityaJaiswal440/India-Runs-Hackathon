@@ -26,5 +26,5 @@ RUN mkdir -p data/embeddings && \
     cp artifacts/embeddings.fp16.npz data/embeddings/ && \
     cp artifacts/candidate_ids.json data/embeddings/
 
-# Run the pipeline to generate submission.csv as default entrypoint
+# Run the pipeline to generate era.csv as default entrypoint
 CMD ["python", "run_pipeline.py"]

@@ -3,8 +3,8 @@
 Audit script implementing SPEC-14 assertions and the Gate P4 anti-hallucination test.
 
 Usage:
-    python scripts/audit_submission.py [submission.csv]
-If no argument is supplied, ``submission.csv`` in the current working directory is used.
+    python scripts/audit_submission.py [era.csv]
+If no argument is supplied, ``era.csv`` in the current working directory is used.
 """
 
 import sys
@@ -47,7 +47,7 @@ def main():
     # -----------------------------------------------------------------------
     # 1️⃣ Load inputs
     # -----------------------------------------------------------------------
-    csv_path = sys.argv[1] if len(sys.argv) > 1 else "submission.csv"
+    csv_path = sys.argv[1] if len(sys.argv) > 1 else "era.csv"
     assert_true(os.path.isfile(csv_path), f"Submission file not found: {csv_path}")
 
     # Find project root (the directory containing 'src' and 'artifacts')

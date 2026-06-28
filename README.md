@@ -22,7 +22,7 @@ With our latest refactor, the legacy two-phase offline/online split has been con
 3.  **Heuristic & Honeypot Checks:** Dynamically applies logical rule-based checks (like `is_honeypot`) and structure-based modifiers (Years of Experience, consulting-only, behavioral availability) directly during the scoring loop.
 4.  **Composite Scoring:** Calculates a final hybrid score for each candidate using the semantic baseline merged with the heuristic multipliers and penalties.
 5.  **Reasoning Generation:** Generates 1-2 sentence, fact-grounded, zero-hallucination justifications for the top candidates, guaranteeing absolute traceability.
-6.  **CSV Output:** Automatically writes the final `submission.csv` in the exact format required by the validators.
+6.  **CSV Output:** Automatically writes the final `era.csv` in the exact format required by the validators.
 
 ## Project Structure
 
@@ -44,7 +44,7 @@ India-Runs-Hackathon/
 ├── Makefile                     # Gameday commands
 ├── README.md                    # Documentation
 ├── run_pipeline.py              # Entry point script
-└── submission.csv               # The final generated ranking output
+└── era.csv                      # The final generated ranking output
 ```
 
 ## Step-by-Step Guide for Judges (Sandbox Evaluation)
@@ -84,7 +84,7 @@ make setup
 ```
 
 **2. The Single Execution Command:**
-To build the Docker container and execute the entire ranking pipeline (outputting `submission.csv` to your host directory in under 2 minutes), simply run:
+To build the Docker container and execute the entire ranking pipeline (outputting `era.csv` to your host directory in under 2 minutes), simply run:
 ```bash
 make gameday
 ```
@@ -95,3 +95,31 @@ make gameday
 *   **≤16 GB RAM:** Data loading uses Python generators (`yield`). Memory consumption peaks at ~3GB for embeddings lookup.
 *   **CPU-only / No Network:** All models (`all-MiniLM-L6-v2`) run locally. No OpenAI/Anthropic API calls are made.
 *   **Honeypot Defense:** Logical checks in `honeypot.py` catch impossible profiles (e.g., `signup_date > last_active_date`) and hard-zero their scores before ranking.
+
+## Troubleshooting
+
+### `make: command not found`
+If you receive a `make: command not found` error when trying to run `make setup`, `make gameday`, or `make sandbox`, it means the `make` utility is not installed on your system. 
+
+**For Windows Users:**
+The easiest way to run this on Windows is using WSL (Windows Subsystem for Linux) or Git Bash. If you must use standard Windows cmd/PowerShell, you can install `make` via Chocolatey:
+```powershell
+choco install make
+```
+*Alternatively, you can skip `make` entirely and just run the Docker commands directly. For example, to run the sandbox:*
+```powershell
+docker run --rm -p 8000:8000 --memory="16g" --memory-swap="16g" --cpus="1.0" 3aryan8/india-runs-hackthon:latest
+```
+
+**For Linux (Ubuntu/Debian) Users:**
+Simply install the `build-essential` package which includes `make`:
+```bash
+sudo apt update
+sudo apt install build-essential
+```
+
+**For macOS Users:**
+Install Xcode Command Line Tools:
+```bash
+xcode-select --install
+```

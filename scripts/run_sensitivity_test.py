@@ -15,7 +15,7 @@ from src.utils.config import Config
 from src.features.heuristic_extractor import behavioral_multiplier
 
 def load_top_100_ids():
-    csv_path = "submission.csv"
+    csv_path = "era.csv"
     if not os.path.exists(csv_path):
         return set()
     ids = set()
