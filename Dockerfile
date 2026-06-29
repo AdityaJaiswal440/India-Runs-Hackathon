@@ -1,30 +1,37 @@
 # Use official lightweight Python 3.11 base image
 FROM python:3.11-slim
 
-# Set environment variables for clean execution
+# Environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app/src
 
-# Set working directory inside container
+# Working directory
 WORKDIR /app
 
-# Install system dependencies if required (e.g., git, build essentials)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy and install Python dependencies
+# Copy requirements first for better layer caching
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the codebase into the container
+# Install build tools, dependencies, then remove build tools
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential && \
+    pip install --no-cache-dir \
+        --index-url https://download.pytorch.org/whl/cpu \
+        torch==2.12.1+cpu && \
+    pip install --no-cache-dir \
+        --upgrade-strategy only-if-needed \
+        -r requirements.txt && \
+    apt-get purge -y build-essential && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy the application
 COPY . .
 
-# Setup embeddings to satisfy the canonical path guard
+# Setup embeddings
 RUN mkdir -p data/embeddings && \
     cp artifacts/embeddings.fp16.npz data/embeddings/ && \
     cp artifacts/candidate_ids.json data/embeddings/
 
-# Start the Interactive Sandbox API as default entrypoint
+# Start the API
 CMD ["uvicorn", "sandbox.app:app", "--host", "0.0.0.0", "--port", "8000"]
