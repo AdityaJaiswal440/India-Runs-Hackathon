@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/pipeline-hero.svg" width="100%" alt="Redrob Candidate Ranker pipeline animation">
+  <img src="pipeline-hero.svg" width="100%" alt="Redrob Candidate Ranker pipeline animation">
 </p>
 
 <p align="center">
@@ -249,7 +249,7 @@ Runs the full ranker, writes `era.csv` (`candidate_id`, `rank`, `score`, `reason
 ## Scoring Model
 
 <p align="center">
-  <img src="assets/scoring-bars.svg" width="100%" alt="Animated scoring weight breakdown">
+  <img src="scoring-bars.svg" width="100%" alt="Animated scoring weight breakdown">
 </p>
 
 ### Final Score Formula
