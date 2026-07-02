@@ -496,10 +496,16 @@ sudo apt install build-essential
 ```
 
 **For macOS Users:**
-Install Xcode Command Line Tools:
+### `open Dockerfile: no such file or directory` during build
+If you receive the following error when attempting to build the Docker image:
+`ERROR: failed to build: failed to solve: failed to read dockerfile: open Dockerfile: no such file or directory`
+
+This happens because you are executing the build command from outside the repository root directory (for example, in your user home directory `~`). You **must** change directory into the cloned project root before running `docker build`:
 ```bash
-xcode-select --install
+cd /home/aryan/Desktop/hackton/India-Runs-Hackathon
+docker build -t india-runs-hackathon .
 ```
+
 ## Tech Stack
 
 | Category | Tool |
