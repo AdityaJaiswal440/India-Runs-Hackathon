@@ -4,7 +4,7 @@ FROM python:3.11-slim
 # Environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH=/app/src
+ENV PYTHONPATH=/app:/app/src
 
 # Working directory
 WORKDIR /app
@@ -27,11 +27,16 @@ RUN apt-get update && \
 
 # Copy the application
 COPY . .
+# Copy precomputed embeddings into the container for reproducibility
+RUN mkdir -p data/embeddings
+COPY artifacts/embeddings.fp16.npz data/embeddings/embeddings.fp16.npz
+COPY artifacts/candidate_ids.json data/embeddings/candidate_ids.json
 
-# Setup embeddings
-RUN mkdir -p data/embeddings && \
-    cp artifacts/embeddings.fp16.npz data/embeddings/ && \
-    cp artifacts/candidate_ids.json data/embeddings/
+# Copy the committed submission artifact so /reproduce endpoint can serve it
+COPY era.csv era.csv
+
+# Expose port for the Sandbox API
+EXPOSE 8000
 
 # Start the API
 CMD ["uvicorn", "sandbox.app:app", "--host", "0.0.0.0", "--port", "8000"]

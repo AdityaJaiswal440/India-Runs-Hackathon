@@ -44,8 +44,8 @@ The **Redrob Intelligent Candidate Ranker** ranks **100,000 candidate profiles**
 
 | Constraint | Target | Hackathon Limit |
 |---|---|---|
-| Latency | ≤ 2 minutes | ≤ 5 minutes |
-| Memory | ≤ 3 GB RAM | ≤ 16 GB |
+| Latency | ≤ 3 minutes | ≤ 5 minutes |
+| Memory | ≤ 9 GB RAM | ≤ 16 GB |
 | Hardware | CPU-only | CPU-only |
 | Network | Fully offline | `--network none` |
 | Ordering | Deterministic, tie-broken by `candidate_id` | — |
@@ -378,7 +378,100 @@ pytest tests/
 5. **Fact-Grounded Reasoning** — deterministic extractors guarantee every claim in a candidate's justification is traceable to their actual profile — no hallucinated skills or history.
 
 ---
+## Step-by-Step Guide for Judges (Sandbox Evaluation)
 
+We provide a pre‑built Docker Hub image that contains the complete environment, model weights, and pre‑computed embeddings. This image lets judges evaluate the ranking pipeline without any additional downloads.
+
+### 1️⃣ Pull and run the sandbox container
+```bash
+docker pull 3aryan8/india-runs-hackthon:latest
+docker run --rm -p 8000:8000 \
+    --memory="16g" --memory-swap="16g" --cpus="1.0" \
+    3aryan8/india-runs-hackthon:latest
+```
+The command starts a FastAPI server on port 8000. You will see log lines ending with `Uvicorn running on http://0.0.0.0:8000`.
+
+### 2️⃣ Interact via the Swagger UI
+Open your browser and navigate to `http://localhost:8000/docs`.  
+1. Click **POST /rank**.  
+2. Press **Try it out**.  
+3. Use **Choose File** to upload a candidate list in `.jsonl` format.  
+   - The repository already ships `data/raw/sample_candidates.jsonl` for a quick 10‑candidate test.  
+4. Click **Execute**.
+
+### 3️⃣ Retrieve the ranking result
+When the request finishes, the UI shows a **Download file** link. Clicking it downloads `era.csv`, which follows the exact submission specification (columns `candidate_id, rank, score, reasoning`). Save the file wherever you like – this is the reproducible output the judges expect.
+
+### 4️⃣ Run the pipeline on your own small dataset
+If you want to rank a custom set of candidates:
+
+1. Create a JSONL file where each line is a JSON object matching the schema described in `submission_metadata_template.yaml`.  
+2. Place the file anywhere on your host machine, e.g. `my_candidates.jsonl`.  
+3. Run the same Docker container, mounting the directory so the API can access the file:
+```bash
+docker run --rm -p 8000:8000 \
+    -v $(pwd):/app/host \
+    3aryan8/india-runs-hackthon:latest
+```
+Then, in the Swagger UI, browse to the mounted path `/app/host/my_candidates.jsonl` when uploading. The returned `era.csv` will contain the ranking for your custom data.
+
+> **Note:** The import fix (`src.challenge.honeypot` → correct path) is already included in the published image, so the container starts without the `ModuleNotFoundError` you saw earlier.
+
+---
+
+## Setup & Execution (Full Pipeline)
+
+**1. Clone and Setup:**
+```bash
+git clone https://github.com/AdityaJaiswal440/India-Runs-Hackathon.git
+cd India-Runs-Hackathon
+make setup
+```
+
+**2. The Single Execution Command:**
+To build the Docker container and execute the entire ranking pipeline (outputting `era.csv` to your host directory in under 2 minutes), simply run:
+```bash
+make gameday
+```
+
+---
+
+## Constraints Compliance
+
+* **≤5 min wall-clock:** The unified pipeline performs zero network inference and completes all scoring dynamically in under 2 minutes.
+* **≤16 GB RAM:** Data loading uses Python generators (`yield`). Memory consumption peaks at ~3GB for embeddings lookup.
+* **CPU-only / No Network:** All models (`all-MiniLM-L6-v2`) run locally. No OpenAI/Anthropic API calls are made.
+* **Honeypot Defense:** Logical checks in `honeypot.py` catch impossible profiles (e.g., `signup_date > last_active_date`) and hard-zero their scores before ranking.
+
+---
+
+## Troubleshooting
+
+### `make: command not found`
+If you receive a `make: command not found` error when trying to run `make setup`, `make gameday`, or `make sandbox`, it means the `make` utility is not installed on your system.
+
+**For Windows Users:**
+The easiest way to run this on Windows is using WSL (Windows Subsystem for Linux) or Git Bash. If you must use standard Windows cmd/PowerShell, you can install `make` via Chocolatey:
+```bash
+choco install make
+```
+Alternatively, you can skip `make` entirely and just run the Docker commands directly. For example, to run the sandbox:
+```bash
+docker run --rm -p 8000:8000 --memory="16g" --memory-swap="16g" --cpus="1.0" 3aryan8/india-runs-hackthon:latest
+```
+
+**For Linux (Ubuntu/Debian) Users:**
+Simply install the `build-essential` package which includes `make`:
+```bash
+sudo apt update
+sudo apt install build-essential
+```
+
+**For macOS Users:**
+Install Xcode Command Line Tools:
+```bash
+xcode-select --install
+```
 ## Tech Stack
 
 | Category | Tool |

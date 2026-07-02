@@ -48,5 +48,3 @@ scripts/verify_parity.py
 scripts/compare_submissions.py
 scratch_*.py
 
-# Development scratch workspace — never tracked
-sandbox/
