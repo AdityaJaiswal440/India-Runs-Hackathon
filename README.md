@@ -422,6 +422,24 @@ If you want to test the ranking pipeline dynamically on a small set of candidate
    - Click **"Download file"** to download the generated ranking file named **`output.csv`**.
    - You can also view the full CSV structure and candidate scores directly inside the response preview.
 
+#### Method C: Build and Run Sandbox Locally from Source
+If you want to clone the repository and build the container locally from the source files:
+1. Clone the repository and **navigate into the repository root folder**:
+   ```bash
+   git clone https://github.com/AdityaJaiswal440/India-Runs-Hackathon.git
+   cd India-Runs-Hackathon
+   ```
+   > ⚠️ **IMPORTANT:** You must run the `docker build` command from the root of the cloned repository folder (where the `Dockerfile` resides). Running it from your home (`~`) or other directories will cause Docker to fail with `open Dockerfile: no such file or directory`.
+2. Build the Docker image locally:
+   ```bash
+   docker build -t india-runs-hackathon .
+   ```
+3. Run the container:
+   ```bash
+   docker run --rm -p 8000:8000 --memory="16g" --memory-swap="16g" --cpus="1.0" india-runs-hackathon:latest
+   ```
+4. Navigate to `http://localhost:8000/docs` in your browser.
+
 ---
 
 ### 3️⃣ Understanding the Output Format
@@ -496,16 +514,10 @@ sudo apt install build-essential
 ```
 
 **For macOS Users:**
-### `open Dockerfile: no such file or directory` during build
-If you receive the following error when attempting to build the Docker image:
-`ERROR: failed to build: failed to solve: failed to read dockerfile: open Dockerfile: no such file or directory`
-
-This happens because you are executing the build command from outside the repository root directory (for example, in your user home directory `~`). You **must** change directory into the cloned project root before running `docker build`:
+Install Xcode Command Line Tools:
 ```bash
-cd /home/aryan/Desktop/hackton/India-Runs-Hackathon
-docker build -t india-runs-hackathon .
+xcode-select --install
 ```
-
 ## Tech Stack
 
 | Category | Tool |
