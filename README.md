@@ -378,44 +378,72 @@ pytest tests/
 5. **Fact-Grounded Reasoning** — deterministic extractors guarantee every claim in a candidate's justification is traceable to their actual profile — no hallucinated skills or history.
 
 ---
+---
 ## Step-by-Step Guide for Judges (Sandbox Evaluation)
 
-We provide a pre‑built Docker Hub image that contains the complete environment, model weights, and pre‑computed embeddings. This image lets judges evaluate the ranking pipeline without any additional downloads.
+We have provided a fully interactive FastAPI sandbox so judges can easily evaluate the model in an isolated environment by uploading `.jsonl` payloads, retrieving immediate rankings, or downloading the reproduced evaluation results.
 
-### 1️⃣ Pull and run the sandbox container
+### 1️⃣ Launch the Interactive Sandbox
+You can launch the API instantly using our pre-built Docker Hub image (which comes pre-loaded with the environment, models, and embeddings). When you run this, it starts a live web server!
+
 ```bash
 docker pull 3aryan8/india-runs-hackthon:latest
-docker run --rm -p 8000:8000 \
-    --memory="16g" --memory-swap="16g" --cpus="1.0" \
-    3aryan8/india-runs-hackthon:latest
+docker run --rm -p 8000:8000 --memory="16g" --memory-swap="16g" --cpus="1.0" 3aryan8/india-runs-hackthon:latest
 ```
-The command starts a FastAPI server on port 8000. You will see log lines ending with `Uvicorn running on http://0.0.0.0:8000`.
+The command starts a FastAPI server on port `8000`. You will see startup log lines ending with:
+`INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)`
 
-### 2️⃣ Interact via the Swagger UI
-Open your browser and navigate to `http://localhost:8000/docs`.  
-1. Click **POST /rank**.  
-2. Press **Try it out**.  
-3. Use **Choose File** to upload a candidate list in `.jsonl` format.  
-   - The repository already ships `data/raw/sample_candidates.jsonl` for a quick 10‑candidate test.  
-4. Click **Execute**.
+---
 
-### 3️⃣ Retrieve the ranking result
-When the request finishes, the UI shows a **Download file** link. Clicking it downloads `era.csv`, which follows the exact submission specification (columns `candidate_id, rank, score, reasoning`). Save the file wherever you like – this is the reproducible output the judges expect.
+### 2️⃣ Navigate the Interactive Swagger UI
+Once the server is running, open your web browser and go to:
+👉 **[http://localhost:8000/docs](http://localhost:8000/docs)**
 
-### 4️⃣ Run the pipeline on your own small dataset
-If you want to rank a custom set of candidates:
+You will be greeted by a clean Swagger UI documentation page listing three core endpoint categories. Here is exactly how to use them:
 
-1. Create a JSONL file where each line is a JSON object matching the schema described in `submission_metadata_template.yaml`.  
-2. Place the file anywhere on your host machine, e.g. `my_candidates.jsonl`.  
-3. Run the same Docker container, mounting the directory so the API can access the file:
-```bash
-docker run --rm -p 8000:8000 \
-    -v $(pwd):/app/host \
-    3aryan8/india-runs-hackthon:latest
-```
-Then, in the Swagger UI, browse to the mounted path `/app/host/my_candidates.jsonl` when uploading. The returned `era.csv` will contain the ranking for your custom data.
+#### Method A: Get the Fully Reproduced `era.csv` (The 100k Dataset Results)
+If you want to instantly verify or retrieve the final, reproducible submission `era.csv` file without running the full pipeline from scratch:
+1. Under the **Reproducibility** section, click on **`GET /reproduce`** to expand the endpoint card.
+2. Click the **"Try it out"** button on the right-hand side.
+3. Click the blue **"Execute"** button.
+4. Scroll down to the **Server response (Code 200)** section.
+5. Click **"Download file"** to download the exact `era.csv` matching the submission file. You can also view the preview of the top candidates in the response body.
 
-> **Note:** The import fix (`src.challenge.honeypot` → correct path) is already included in the published image, so the container starts without the `ModuleNotFoundError` you saw earlier.
+#### Method B: Rank a Custom/Sample Candidate List (`POST /rank`)
+If you want to test the ranking pipeline dynamically on a small set of candidates:
+1. Under the **Sandbox** section, click on **`POST /rank`** to expand the endpoint card.
+2. Click the **"Try it out"** button on the right-hand side.
+3. In the parameter list, find the **`file`** upload parameter. Click **"Choose File"** (or "Browse").
+4. Select a `.jsonl` or `.jsonl.gz` candidate payload file.
+   - *Quick Test:* You can upload **`data/raw/sample_candidates.jsonl`** from this repository (a lightweight 10-candidate test set).
+5. Click the blue **"Execute"** button.
+6. The model will process the candidates using our hybrid BM25 + dense semantic scoring, apply honeypot checks, filter out invalid/synthetic profiles, and sort the remaining candidates.
+7. Scroll down to the **Server response (Code 200)**:
+   - Click **"Download file"** to download the generated ranking file named **`output.csv`**.
+   - You can also view the full CSV structure and candidate scores directly inside the response preview.
+
+---
+
+### 3️⃣ Understanding the Output Format
+The downloadable CSV (`output.csv` or `era.csv`) follows the exact requirements of the hackathon:
+* **`candidate_id`**: The unique identifier of the candidate.
+* **`rank`**: The relative position of the candidate in the final sorted list (from 1 to 100).
+* **`score`**: The calibrated score representing candidate relevance (higher is better).
+* **`reasoning`**: A concise, two-sentence, fact-grounded justification explaining why the candidate was ranked at their position (including years of experience, core matching skills, and any flags like long notice periods).
+
+---
+
+### 4️⃣ Mounting Host Directories for Custom Datasets
+To evaluate candidate datasets stored on your local machine without uploading them manually:
+1. Mount your current directory to the container when launching it:
+   ```bash
+   docker run --rm -p 8000:8000 \
+       --memory="16g" --memory-swap="16g" --cpus="1.0" \
+       -v $(pwd):/app/host \
+       3aryan8/india-runs-hackthon:latest
+   ```
+2. Any candidate file in your current folder will be accessible inside the container under `/app/host/`.
+3. In the Swagger UI, select your local file under `/app/host/` for processing.
 
 ---
 
